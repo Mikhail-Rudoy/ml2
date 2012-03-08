@@ -1,5 +1,5 @@
 def readFile(filename):
-    result = open(filename).readlines()
+    result = open(filename, "r").readlines()
     for i in range(len(result)):
         result[i] = result[i].strip()
     return result
