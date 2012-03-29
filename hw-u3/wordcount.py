@@ -1,37 +1,35 @@
 import random
 
-def add_word(d,word):
-    if d.has_key(word):
-        d[word] = d[word] + 1
-    else:
-        d[word]=1
+def build_mongrams(slist):
+    d={}
+    for word in slist:
+        if d.has_key(word):
+            d[word] = d[word] + 1
+        else:
+            d[word] = 1
     return d
 
 def build_bigrams(slist):
     d={}
-    # [the,try,works,are,planted,in,the,something]
-    for i in range(len(slist)-1):
+    for i in range(len(slist) - 1):
         prefix = slist[i]
         suffix = slist[i+1]
         if d.has_key(prefix):
-            # it's already in the dictionary
             d[prefix].append(suffix)
         else:
-            # it isn't in the dictionary yet
-            #nl = []
-            #nl.append(suffix)
-            #d[prefix] = nl
             d[prefix] = [suffix]
     return d
 
-
-def build_word_freq(slist):
+def build_trigrams(slist):
     d={}
-    for word in slist:
-        d = add_word(d,word)
+    for i in range(len(slist) - 2):
+        prefix = " ".join(slist[i:i+2])
+        suffix = slist[i+2]
+        if d.has_key(prefix):
+            d[prefix].append(suffix)
+        else:
+            d[prefix] = [suffix]
     return d
-
-
 
 def load_file(filename):
     f = open(filename,"r")
@@ -47,17 +45,28 @@ def load_file(filename):
         l2.append(line2)
     return " ".join(l2)
 
-def make_sentence(bigrams,length):
-    allwords = bigrams.keys()
-    
-    nextword= random.choice(allwords)
-    s=nextword
-                            
+def make_sentence1(slist, length):
+    s = ""
     for i in range(length):
-        nextword= random.choice(bigrams[nextword])
+        s = s + random.choice(slist) + " "
+    print s
+
+def make_sentence2(bigrams,length):
+    allwords = bigrams.keys()
+    s = random.choice(allwords)
+    nextword = s
+    for i in range(length):
+        nextword = random.choice(bigrams[nextword])
         s = s + " " + nextword
     print s
-    
+
+def make_sentence3(trigrams,length):
+    lastpairs = bigrams.keys()
+    lastpair = random.choice(lastpairs)
+    for i in range(length):
+        s = s + " " + random.choice(bigrams[nextword])
+    print s
+
 text = load_file("psalms.txt")
 
 #print text
