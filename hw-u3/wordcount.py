@@ -31,6 +31,18 @@ def build_trigrams(slist):
             d[prefix] = [suffix]
     return d
 
+
+def build_ngrams(slist, n):
+    d={}
+    for i in range(len(slist) + 1 - n):
+        prefix = " ".join(slist[i:i+n-1])
+        suffix = slist[i+n-1]
+        if d.has_key(prefix):
+            d[prefix].append(suffix)
+        else:
+            d[prefix] = [suffix]
+    return d
+
 def load_file(filename):
     f = open(filename,"r")
     l = f.readlines()
@@ -61,24 +73,37 @@ def make_sentence2(bigrams,length):
     print s
 
 def make_sentence3(trigrams,length):
-    lastpairs = bigrams.keys()
+    lastpairs = trigrams.keys()
     lastpair = random.choice(lastpairs)
+    s = lastpair
     for i in range(length):
-        s = s + " " + random.choice(bigrams[nextword])
+        nextword = random.choice(trigrams[lastpair])
+        lastpair = lastpair[lastpair.find(" ") + 1 : ] + " " + nextword
+        s = s + " " + nextword
     print s
 
-text = load_file("psalms.txt")
+def make_sentencen(slist, n, length):
+    if n <= 1:
+        make_sentence1(slist, length)
+        return
+    if n == 2:
+        make_sentence2(build_bigrams(slist), length)
+        return
+    if n == 3:
+        make_sentence3(build_trigrams(slist), length)
+        return
+    ngrams = build_ngrams(slist, n)
+    lastnmos = ngrams.keys()
+    lastnmo = random.choice(lastnmos)
+    s = lastnmo
+    for i in range(length):
+        nextword = random.choice(ngrams[lastnmo])
+        lastnmo = lastnmo[lastnmo.find(" ") + 1 : ] + " " + nextword
+        s = s + " " + nextword
+    print s
 
-#print text
-#freq= build_word_freq(text.split())
-bigrams = build_bigrams(text.split())
-print "Done"
-make_sentence(bigrams,50)
-#print bigrams
-#l=build_word_freq("I will not eat them sam I am I will not eat green eggs and ham")
-#print l
-#l = build_word_freq("fred waldo barney")
-#print l
-#l = build_word_freq("I will not eat them sam I am I will not eat green eggs and ham".split())
-#print l
+text = load_file("psalms.txt").split() + load_file("moby_dick.txt").split() + load_file("sonnets.txt").split()
 
+for i in range(6):
+    make_sentencen(text, i+1, 40)
+    print ""
