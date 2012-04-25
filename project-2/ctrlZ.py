@@ -63,12 +63,9 @@ board = []
 for i in range(18):
     board.append([None, None, None, None, None, None, None, None, None, None])
 selected = [None, None, None, None]
-neighbors = {}
-for r in range(18):
-    for c in range(10):
-        neighbors[(25 * c, 395 - 25 * r, 25, 10)] = [(25 * c - 25, 395 - 25 * r, 25, 10), (25 * c + 25, 395 - 25 * r, 25, 10), (5 + 25 * c, 380 - 25 * r, 15, 15), (5 + 25 * c, 405 - 25 * r, 15, 15)]
-    if ((x % 25) + 10) / 15 == 1:
-        return (5 + 25 * r, 380 - 25 * r, 15, 15)
+piece = [None, None, None, None]
+path = []
+
 mousePressed = False
 spacePressed = False
 
@@ -140,12 +137,7 @@ while True:
         changes = []
         if mousePressed:
             x, y = pygame.mouse.get_pos()
-            loc = getCellLocation(x, y)
-            if loc != None and (loc[2] == 15 or spacePressed):
-                if selected[0] = None:
-                    selected[0] = loc
-                    changes.appned(loc)
-                    
+            pass
         else:
             pass
         while True:
@@ -158,15 +150,7 @@ while True:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mousePressed = True
-##                    for loc in selected:
-##                        if loc == None:
-##                            break;
-##                        r, c = loc
-##                        if r.imag != 0:
-##                            r = r.real
-##                            changes.append((0, 395 - 25 * r, 250, 10))
-##                        else:
-##                            changes.append((25 * c, 375 - 25 * r, 25, 25))
+                    pass 
                     selected = [None, None, None, None]
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -194,13 +178,3 @@ while True:
         pygame.display.update(changes)
         changes = []
         clock.tick(40)
-
-def getCellLocation(x, y):
-    r, c = (400 - y) / 25, x / 25
-    if (400 - y) % 25 <= 5:
-        return (25 * c, 395 - 25 * r, 25, 10)
-    if (400 - y) % 25 >= 20:
-        return (25 * c, 370 - 25 * r, 25, 10)
-    if ((x % 25) + 10) / 15 == 1:
-        return (5 + 25 * r, 380 - 25 * r, 15, 15)
-    return None
