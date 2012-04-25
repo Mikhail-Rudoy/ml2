@@ -58,8 +58,8 @@ if not music:
 board = []
 for i in range(18):
     board.append([None, None, None, None, None, None, None, None, None, None])
-
 selected = [None, None, None, None]
+mousePressed = False
 
 screen.fill((255, 255, 255))
 for loc in selected:
@@ -87,6 +87,12 @@ while True:
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mousePressed = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    mousePressed = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = 0
@@ -116,6 +122,11 @@ while True:
         clock.tick(10)
     else:
         changes = []
+        if mousePressed:
+            x, y = pygame.mouse.get_pos()
+            pass
+        else:
+            pass
         while True:
             event = pygame.event.poll()
             if event.type == pygame.NOEVENT:
@@ -123,6 +134,12 @@ while True:
             elif event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mousePressed = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    mousePressed = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = 1
