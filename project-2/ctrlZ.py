@@ -57,9 +57,9 @@ if not music:
 
 board = []
 for i in range(18):
-    board.append([(100, 100, 100), None, None, None, None, None, None, None, None, None])
+    board.append([None, None, None, None, None, None, None, None, None, None])
 
-selected = [(0, 0), None, None, None]
+selected = [None, None, None, None]
 
 screen.fill((255, 255, 255))
 for loc in selected:
