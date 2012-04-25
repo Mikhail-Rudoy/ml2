@@ -1,25 +1,44 @@
-import pygame
+import pygame, sys
 
 pygame.init()
+screen = pygame.display.set_mode((250, 500))
+clock = pygame.time.Clock()
 
-screen = pygame.display.set_mode((250, 400))
+pygame.display.set_caption("Ctrl-Z")
 
-for x in range(10):
-    for y in range(16):
-        pygame.draw.rect(screen, pygame.Color(255, 255, 200, 255), ((5 + 25 * x, 5 + 25 * y), (15, 15)))
+paused = 1
+pauseText = pygame.font.Font(None, 35).render("Press \"p\" to unpause.", True, (255, 255, 255))
 
-pygame.display.update()
 
-pygame.draw.rect(screen, pygame.Color(0, 0, 255, 255), ((25, 25), (25, 25)))
-pygame.draw.rect(screen, pygame.Color(255, 255, 200, 255), ((30, 30), (15, 15)))
+while True:
+    if paused:
+        if paused == 1:
+            screen.fill((0, 0, 0))
+            screen.blit(pauseText, (0, 200))
+            paused = 2
+            pygame.display.update()
+        while True:
+            event = pygame.event.poll()
+            if event.type == pygame.NOEVENT:
+                break
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = 0
+                    break
+                if event.key == pygame.K_ESC:
+                    pygame.quit()
+                    sys.exit()
+        del event
+        clock.tick(10)
+    else:
+        screen.fill((255, 255, 255))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
-pygame.draw.rect(screen, pygame.Color(0, 0, 255, 255), ((25, 50), (25, 25)))
-pygame.draw.rect(screen, pygame.Color(255, 255, 200, 255), ((30, 55), (15, 15)))
-
-pygame.draw.rect(screen, pygame.Color(0, 0, 255, 255), ((50, 50), (25, 25)))
-pygame.draw.rect(screen, pygame.Color(255, 255, 200, 255), ((55, 55), (15, 15)))
-
-pygame.draw.rect(screen, pygame.Color(0, 0, 255, 255), ((75, 50), (25, 25)))
-pygame.draw.rect(screen, pygame.Color(255, 255, 200, 255), ((80, 55), (15, 15)))
-
-pygame.display.update()
+        pygame.display.update()
+        clock.tick(40)
