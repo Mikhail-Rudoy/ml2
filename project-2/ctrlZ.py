@@ -59,18 +59,18 @@ board = []
 for i in range(18):
     board.append([(100, 100, 100), None, None, None, None, None, None, None, None, None])
 
-selected = [(1, 1), None, None, None]
+selected = [(0, 0), None, None, None]
 
 screen.fill((255, 255, 255))
 for loc in selected:
     if loc != None:
         r, c = loc
-        pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * r, 25, 25))
+        pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
 for r in range(16):
     for c in range(10):
         if board[r][c] != None:
-            pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * c, 15, 15))
-python.display.update()
+            pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
+pygame.display.update()
 clock.tick(40)
 
 while True:
@@ -94,7 +94,7 @@ while True:
                     for loc in selected:
                         if loc != None:
                             r, c = loc
-                            pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * r, 25, 25))
+                            pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
                     for r in range(16):
                         for c in range(10):
                             if board[r][c] != None:
@@ -115,7 +115,7 @@ while True:
         del event
         clock.tick(10)
     else:
-        screen.fill((255, 255, 255))
+        changes = []
         while True:
             event = pygame.event.poll()
             if event.type == pygame.NOEVENT:
@@ -138,5 +138,6 @@ while True:
                     pygame.quit()
                     sys.exit()
         del event
-        pygame.display.update()
+        pygame.display.update(changes)
+        changes = []
         clock.tick(40)
