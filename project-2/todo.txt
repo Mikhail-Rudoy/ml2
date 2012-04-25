@@ -1,0 +1,5 @@
+move blocks
+select blocks
+unselect blocks
+draw everything
+upon block hitting top do everything
