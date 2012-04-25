@@ -59,6 +59,7 @@ board = []
 for i in range(18):
     board.append([None, None, None, None, None, None, None, None, None, None])
 selected = [None, None, None, None]
+selectedShape = None
 mousePressed = False
 
 screen.fill((255, 255, 255))
@@ -105,7 +106,7 @@ while True:
                         for c in range(10):
                             if board[r][c] != None:
                                 pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * c, 15, 15))
-                    python.display.update()
+                    pygame.display.update()
                     clock.tick(40)
                     break
                 elif event.key == pygame.K_m:
@@ -137,6 +138,8 @@ while True:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mousePressed = True
+                    selected = [None, None, None, None]
+                    selectedShape = None
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     mousePressed = False
