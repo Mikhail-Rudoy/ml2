@@ -33,17 +33,21 @@ while True:
             else:
                 music = True
                 pygame.mixer.music.unpause()
-        elif event.key == pygame.K_SPACE:
-            if music:
-                pygame.mixer.music.fadeout(2000)
-            else:
-                pygame.time.wait(2000)
-            break
         elif event.key == pygame.K_ESCAPE:
             pygame.quit()
             sys.exit()
         else:
-            continue
+            if music:
+                pygame.mixer.music.fadeout(1500)
+            else:
+                pygame.time.wait(1500)
+            break
+    elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if music:
+            pygame.mixer.music.fadeout(1500)
+        else:
+            pygame.time.wait(1500)
+        break
     else:
         continue
     clock.tick(4)
@@ -59,8 +63,14 @@ board = []
 for i in range(18):
     board.append([None, None, None, None, None, None, None, None, None, None])
 selected = [None, None, None, None]
-selectedShape = None
+neighbors = {}
+for r in range(18):
+    for c in range(10):
+        neighbors[(25 * c, 395 - 25 * r, 25, 10)] = [(25 * c - 25, 395 - 25 * r, 25, 10), (25 * c + 25, 395 - 25 * r, 25, 10), (5 + 25 * c, 380 - 25 * r, 15, 15), (5 + 25 * c, 405 - 25 * r, 15, 15)]
+    if ((x % 25) + 10) / 15 == 1:
+        return (5 + 25 * r, 380 - 25 * r, 15, 15)
 mousePressed = False
+spacePressed = False
 
 screen.fill((255, 255, 255))
 for loc in selected:
@@ -94,6 +104,9 @@ while True:
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     mousePressed = False
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    spacePressed = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = 0
@@ -109,6 +122,8 @@ while True:
                     pygame.display.update()
                     clock.tick(40)
                     break
+                elif event.key == pygame.K_SPACE:
+                    spacePressed = True
                 elif event.key == pygame.K_m:
                     if music:
                         music = False
@@ -125,7 +140,12 @@ while True:
         changes = []
         if mousePressed:
             x, y = pygame.mouse.get_pos()
-            pass
+            loc = getCellLocation(x, y)
+            if loc != None and (loc[2] == 15 or spacePressed):
+                if selected[0] = None:
+                    selected[0] = loc
+                    changes.appned(loc)
+                    
         else:
             pass
         while True:
@@ -138,15 +158,28 @@ while True:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mousePressed = True
+##                    for loc in selected:
+##                        if loc == None:
+##                            break;
+##                        r, c = loc
+##                        if r.imag != 0:
+##                            r = r.real
+##                            changes.append((0, 395 - 25 * r, 250, 10))
+##                        else:
+##                            changes.append((25 * c, 375 - 25 * r, 25, 25))
                     selected = [None, None, None, None]
-                    selectedShape = None
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     mousePressed = False
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    spacePressed = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = 1
                     break
+                elif event.key == pygame.K_SPACE:
+                    spacePressed = True
                 elif event.key == pygame.K_m:
                     if music:
                         music = False
@@ -161,3 +194,13 @@ while True:
         pygame.display.update(changes)
         changes = []
         clock.tick(40)
+
+def getCellLocation(x, y):
+    r, c = (400 - y) / 25, x / 25
+    if (400 - y) % 25 <= 5:
+        return (25 * c, 395 - 25 * r, 25, 10)
+    if (400 - y) % 25 >= 20:
+        return (25 * c, 370 - 25 * r, 25, 10)
+    if ((x % 25) + 10) / 15 == 1:
+        return (5 + 25 * r, 380 - 25 * r, 15, 15)
+    return None
