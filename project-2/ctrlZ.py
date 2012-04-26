@@ -60,7 +60,7 @@ if not music:
 
 board = {}
 for i in range(-4, 16):
-    board[i] = [(0, 0, 0), (0, 0, 50), None, None, None, None, None, None, None, None]
+    board[i] = [None] * 10
 board[2][3]=board[3][3] = board[4][3] = board[5][3] = (70, 0, 0)
 selected = [None]
 piece = [None, None, None, None]
@@ -169,7 +169,8 @@ while True:
                             selected[0] = loc
                         else:
                             dr, dc =  r - selected[0][0], c - selected[0][1]
-                            if (abs(dr) <= 1.000001 and dc == 0) or (abs(dc) == 1 and dr == 0):
+                            if (abs(dr) <= 1.000001 and dc == 0) or \
+                               (abs(dc) == 1 and dr == 0):
                                 selected = [loc] + [itm for itm in selected if itm != loc]
                                 if len(selected) == 5:
                                     itm = selected[4]
@@ -186,11 +187,25 @@ while True:
                 loc = ((y - 10) / 25 + 0.5, x / 25)
                 r, c = loc
                 if selected[0] == None:
-                    if spacePressed:
+                    if spacePressed and \
+                       not [1 for i in range(int(r) + 1, 16) \
+                              if board[i] == [None,] * 10]:
                         selected[0] = loc
                 else:
                     dr, dc = r - selected[0][0], c - selected[0][1]
-                    if (abs(dc) == 1 and dr == 0) or (abs(dr) == 0.5 and dc == 0 and (((spacePressed and not [c1 for (r1, c1) in selected for (r2, c2) in selected if c1 == c2 and int(r) in [r1, r2] and int(r) + 1 in [r1, r2] and c1 != c and not c1 in [co for (ro, co) in selected if ro == r]]) or r in [ro for (ro, co) in selected]))):
+                    if (abs(dc) == 1 and dr == 0) or \
+                       (abs(dr) == 0.5 and \
+                         dc == 0 and \
+                         (r in [ro for (ro, co) in selected] or \
+                          (spacePressed and \
+                           not [c1 for (r1, c1) in selected \
+                                   for (r2, c2) in selected \
+                                   if c1 == c2 \
+                                   if int(r) in [r1, r2] \
+                                   if int(r) + 1 in [r1, r2] \
+                                   if c1 != c \
+                                   if not c1 in [co for (ro, co) in selected \
+                                                    if ro == r]]))):
                         spacePressed = 0
                         selected = [loc] + [itm for itm in selected if itm and itm != loc]
                         if len(selected) == 5:
@@ -206,7 +221,22 @@ while True:
                                 pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
         elif selected != [None]:
             already, notyet = [itm for itm in selected if itm and itm[0] == int(itm[0])], [itm for itm in selected if itm and itm[0] != int(itm[0])]
-            if (len(notyet) == 0 and len(already) != 4) or (len(already) > 0 and [board[r][c] for (r, c) in already if board[r][c] != board[already[0][0]][already[0][1]]]) or (not [(r + 1, c) for (r, c) in already if not (r + 1, c) in selected and (r + 1 == 16 or board[r + 1][c])] and not [(int(r) + 1, c) for (r, c) in notyet if not (int(r) + 1, c) in selected and (int(r) + 1 == 16 or board[int(r) + 1][c])] and not (len(notyet) + len(already) < 4 and len(notyet) > 1 and not [r for (r, c) in notyet if r != notyet[0][0]])):
+            if (len(notyet) == 0 and len(already) != 4) or \
+               (len(already) > 0 and [1 for (r, c) in already \
+                                        if board[r][c] != \
+                                           board[already[0][0]][already[0][1]]]) or \
+               (not [(r + 1, c) for (r, c) in already \
+                                if not (r + 1, c) in selected \
+                                if (r + 1 == 16 or \
+                                    board[r + 1][c])] and \
+                not [(int(r) + 1, c) for (r, c) in notyet \ 
+                                     if not (int(r) + 1, c) in selected \
+                                     if (int(r) + 1 == 16 or \
+                                         board[int(r) + 1][c])] and \
+                not (len(notyet) + len(already) < 4 and \
+                     len(notyet) > 1 and \
+                     not [r for (r, c) in notyet \
+                            if r != notyet[0][0]])):
                 for itm in already:
                     pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
                     if board[itm[0]][itm[1]]:
