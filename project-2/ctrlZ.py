@@ -53,7 +53,6 @@ while True:
     clock.tick(4)
     del event
 
-music = True
 pygame.mixer.music.load("song.wav")
 pygame.mixer.music.play(-1)
 if not music:
@@ -61,11 +60,12 @@ if not music:
 
 board = {}
 for i in range(-4, 16):
-    board[i] = [(0, 0, 0), None, None, None, None, None, None, None, None, None]
+    board[i] = [(0, 0, 0), (0, 0, 50), None, None, None, None, None, None, None, None]
 selected = [None]
 piece = [None, None, None, None]
 path = []
 
+beep = pygame.mixer.Sound("Buzzer.ogg")
 mousePressed = False
 spacePressed = False
 
@@ -203,10 +203,9 @@ while True:
                             else:
                                 pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
                                 pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
-        else:
-            print selected
+        elif selected != [None]:
             already, notyet = [itm for itm in selected if itm and itm[0] == int(itm[0])], [itm for itm in selected if itm and itm[0] != int(itm[0])]
-            if (len(notyet) == 0 and len(already) != 4) or (len(already) > 0 and not [board[r][c] for (r, c) in already if board[r][c] != board[already[0][0]][already[0][1]]]):
+            if (len(notyet) == 0 and len(already) != 4) or (len(already) > 0 and [board[r][c] for (r, c) in already if board[r][c] != board[already[0][0]][already[0][1]]]):
                 for itm in already:
                     pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
                     if board[itm[0]][itm[1]]:
@@ -215,7 +214,7 @@ while True:
                 for itm in notyet:
                     pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
                     pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
-                pygame.mixer.Sound("Buzzer.mp3").play()
+                beep.play()
                 selected = [None]
                     
         
