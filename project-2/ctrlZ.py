@@ -190,7 +190,7 @@ while True:
                         selected[0] = loc
                 else:
                     dr, dc = r - selected[0][0], c - selected[0][1]
-                    if (abs(dc) == 1 and dr == 0) or (abs(dr) == 0.5 and dc == 0 and ((spacePressed or r in [ro for (ro, co) in selected]))):
+                    if (abs(dc) == 1 and dr == 0) or (abs(dr) == 0.5 and dc == 0 and (((spacePressed and not [c1 for (r1, c1) in selected for (r2, c2) in selected if c1 == c2 and int(r) in [r1, r2] and int(r) + 1 in [r1, r2] and c1 != c and not c1 in [co for (ro, co) in selected if ro == r]]) or r in [ro for (ro, co) in selected]))):
                         spacePressed = 0
                         selected = [loc] + [itm for itm in selected if itm and itm != loc]
                         if len(selected) == 5:
