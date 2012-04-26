@@ -59,10 +59,10 @@ pygame.mixer.music.play(-1)
 if not music:
     pygame.mixer.music.pause()
 
-board = []
-for i in range(18):
-    board.append([None, None, None, None, None, None, None, None, None, None])
-selected = [None, None, None, None]
+board = {}
+for i in range(-4, 16):
+    board[i] = [(0, 0, 0), None, None, None, None, None, None, None, None, None]
+selected = [None]
 piece = [None, None, None, None]
 path = []
 
@@ -70,10 +70,24 @@ mousePressed = False
 spacePressed = False
 
 screen.fill((255, 255, 255))
+tmp = []
 for loc in selected:
     if loc != None:
         r, c = loc
-        pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+        if r == int(r):
+            pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+        else:
+            tmp.append(loc)
+            pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+for loc in tmp:
+    r, c = loc
+    pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+del tmp
+for loc in piece:
+    if loc != None:
+        r, c, col = loc
+        pygame.draw.rect(screen, col, (25 * c, 25 * r, 25, 25))
+del loc
 for r in range(16):
     for c in range(10):
         if board[r][c] != None:
@@ -101,26 +115,35 @@ while True:
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     mousePressed = False
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_SPACE:
-                    spacePressed = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = 0
                     screen.fill((255, 255, 255))
+                    tmp = []
                     for loc in selected:
                         if loc != None:
                             r, c = loc
-                            pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+                            if r == int(r):
+                                pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+                            else:
+                                tmp.append(loc)
+                                pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+                    for loc in tmp:
+                        r, c = loc
+                        pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+                    del tmp
+                    for loc in piece:
+                        if loc != None:
+                            r, c, col = loc
+                            pygame.draw.rect(screen, col, (25 * c, 25 * r, 25, 25))
+                    del loc
                     for r in range(16):
                         for c in range(10):
                             if board[r][c] != None:
-                                pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * c, 15, 15))
+                                pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
                     pygame.display.update()
                     clock.tick(40)
                     break
-                elif event.key == pygame.K_SPACE:
-                    spacePressed = True
                 elif event.key == pygame.K_m:
                     if music:
                         music = False
@@ -134,12 +157,95 @@ while True:
         del event
         clock.tick(10)
     else:
-        changes = []
         if mousePressed:
             x, y = pygame.mouse.get_pos()
-            pass
+            if ((y % 25) + 10) / 15 == 1:
+                if ((x % 25) + 10) / 15 == 1:
+                    loc = (y / 25, x / 25)
+                    r, c = loc
+                    if board[r][c]:
+                        if selected[0] == None:
+                            selected[0] = loc
+                        else:
+                            dr, dc =  r - selected[0][0], c - selected[0][1]
+                            if (abs(dr) <= 1.000001 and dc == 0) or (abs(dc) == 1 and dr == 0):
+                                selected = [loc] + [itm for itm in selected if itm != loc]
+                                if len(selected) == 5:
+                                    itm = selected[4]
+                                    selected = selected[:4]
+                                    if itm[0] == int(itm[0]):
+                                        pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                                        if board[itm[0]][itm[1]]:
+                                            pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
+                                        pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
+                                    else:
+                                        pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                                        pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
+            else:
+                loc = ((y - 10) / 25 + 0.5, x / 25)
+                r, c = loc
+                if selected[0] == None:
+                    if spacePressed:
+                        selected[0] = loc
+                else:
+                    dr, dc = r - selected[0][0], c - selected[0][1]
+                    if (abs(dc) == 1 and dr == 0) or (abs(dr) == 0.5 and dc == 0 and spacePressed):
+                        spacePressed = 0
+                        selected = [loc] + [itm for itm in selected if itm and itm != loc]
+                        if len(selected) == 5:
+                            itm = selected[4]
+                            selected = selected[:4]
+                            if itm[0] == int(itm[0]):
+                                pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                                if board[itm[0]][itm[1]]:
+                                    pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
+                                pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
+                            else:
+                                pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                                pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
         else:
-            pass
+            print selected
+            already, notyet = [itm for itm in selected if itm and itm[0] == int(itm[0])], [itm for itm in selected if itm and itm[0] != int(itm[0])]
+            if (len(notyet) == 0 and len(already) != 4) or (len(already) > 0 and not [board[r][c] for (r, c) in already if board[r][c] != board[already[0][0]][already[0][1]]]):
+                for itm in already:
+                    pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                    if board[itm[0]][itm[1]]:
+                        pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
+                    pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
+                for itm in notyet:
+                    pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                    pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
+                pygame.mixer.Sound("Buzzer.mp3").play()
+                selected = [None]
+                    
+        
+        if spacePressed:
+            spacePressed = spacePressed - 1
+
+        tmp = []
+        for loc in selected:
+            if loc != None:
+                r, c = loc
+                if r == int(r):
+                    pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+                    if board[r][c]:
+                        pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
+                    pygame.display.update((25 * c, 25 * r, 25, 25))
+                else:
+                    tmp.append(loc)
+                    pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+        for loc in tmp:
+            r, c = loc
+            pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+            pygame.display.update((0, 25 * int(r) + 20, 250, 10))
+        del tmp
+        for loc in piece:
+            if loc != None:
+                r, c, col = loc
+                pygame.draw.rect(screen, col, (25 * c, 25 * r, 25, 25))
+                pygame.display.update((25 * c, 25 * r, 25, 25))
+        del loc
+
         while True:
             event = pygame.event.poll()
             if event.type == pygame.NOEVENT:
@@ -150,20 +256,25 @@ while True:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mousePressed = True
-                    pass 
-                    selected = [None, None, None, None]
+                    already, notyet = [itm for itm in selected if itm and itm[0] == int(itm[0])], [itm for itm in selected if itm and itm[0] != int(itm[0])]
+                    for itm in already:
+                        pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                        if board[itm[0]][itm[1]]:
+                            pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
+                        pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
+                    for itm in notyet:
+                        pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                        pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
+                    selected = [None]
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     mousePressed = False
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_SPACE:
-                    spacePressed = True
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = 1
                     break
                 elif event.key == pygame.K_SPACE:
-                    spacePressed = True
+                    spacePressed = 30
                 elif event.key == pygame.K_m:
                     if music:
                         music = False
@@ -175,6 +286,4 @@ while True:
                     pygame.quit()
                     sys.exit()
         del event
-        pygame.display.update(changes)
-        changes = []
         clock.tick(40)
