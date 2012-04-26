@@ -2,7 +2,7 @@ def readFile(filename):
     result = open(filename, "r").readlines()
     for i in range(len(result)):
         result[i] = result[i].strip()
-    return result
+    return " \n ".join(result)
 
 def boldify(line):
     sofar = "";
@@ -30,16 +30,14 @@ def makeLink(line):
             words[i] = "<a href=" + address + ">" + words[i] + "</a>"
     return " ".join(words)
 
-def convertLineList(lines):
-    result = lines
-    for i in range(len(lines)):
-        result[i] = makeLink(boldify(result[i]))
+def convertLine(line):
+    result = makeLink(boldify(line))
     return result
 
 def listToWebPage(lines):
-    return "<p>" + "</p>\n<p>".join(lines) + "</p>\n"
+    return "<p>" + "</p>\n<p>".join(lines.split("\n")) + "</p>\n"
 
 def convertFile(filename):
-    print listToWebPage(convertLineList(readFile(filename)))
+    print listToWebPage(convertLine(readFile(filename)))
 
 convertFile("markup.txt")
