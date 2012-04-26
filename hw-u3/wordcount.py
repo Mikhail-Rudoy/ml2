@@ -51,10 +51,11 @@ def load_file(filename):
         line = line.strip()
         line = line.lower()
         line2 = ""
-        for c in line:
-            if c in "abcdefghijklmnopqrstuvwxyz ":
-                line2=line2+c
-        l2.append(line2)
+        for i in range(len(line)):
+            if line[i] in "abcdefghijklmnopqrstuvwxyz" or (line[i] == " " and line[i+1] != " "):
+                line2=line2+line[i]
+        if line2 != "":
+            l2.append(line2)
     return " ".join(l2)
 
 def make_sentence1(slist, length):
@@ -104,6 +105,6 @@ def make_sentencen(slist, n, length):
 
 text = load_file("psalms.txt").split() + load_file("moby_dick.txt").split() + load_file("sonnets.txt").split()
 
-for i in range(6):
-    make_sentencen(text, i+1, 40)
+for i in range(1, 7):
+    make_sentencen(text, i, 40)
     print ""

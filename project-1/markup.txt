@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 This is a sample web page. It has *important* stuff in it.
 
@@ -18,3 +19,17 @@ hey check this *out!!!
 1
 11
 1!!!!*
+=======
+
+This is a sample web page. It has *important* stuff in it.
+
+Stuff in it. Some lines have *multiple* *things* that are.
+
+It also talks about sites like stuy.edu and other places.
+
+You might see both cs.stuy.edu and google.com on the same line.
+
+You might even get *bold* and something list stuycs.org on teh same line.
+
+
+>>>>>>> 2a5f106c4ec96f7580f4a05f047ece7254b4ed16
