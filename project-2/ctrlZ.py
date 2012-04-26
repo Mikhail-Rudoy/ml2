@@ -65,6 +65,9 @@ board[2][3]=board[3][3] = board[4][3] = board[5][3] = (70, 0, 0)
 selected = [None]
 piece = [None, None, None, None]
 path = []
+numPieces = 0
+moveDelay = 30
+ticks = 30
 
 beep = pygame.mixer.Sound("Buzzer.ogg")
 mousePressed = False
@@ -247,10 +250,24 @@ while True:
                     pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
                 beep.play()
                 selected = [None]
-                    
-        
+                
         if spacePressed:
             spacePressed = spacePressed - 1
+
+        if ticks:
+            ticks = ticks - 1
+        else:
+            ticks = moveDelay
+            old, piece = piece, [(r + path[0][0], c + path[0][0], col) for (r, c, col) in piece]
+            for (r, c, col) in old:
+                pygame.draw.rect(screen, (0, 0, 0), (25 * c, 25 * r, 25, 25))
+                if board[r][c]:
+                    pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
+                pygame.display.update((25 * c, 25 * r, 25, 25))
+            path = path[1:]
+            if not [1 for (r, c, col) in piece if r >= 0]:
+                # blah
+                pass
 
         tmp = []
         for loc in selected:
