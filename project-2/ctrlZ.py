@@ -61,6 +61,7 @@ if not music:
 board = {}
 for i in range(-4, 16):
     board[i] = [(0, 0, 0), (0, 0, 50), None, None, None, None, None, None, None, None]
+board[2][3]=board[3][3] = board[4][3] = board[5][3] = (70, 0, 0)
 selected = [None]
 piece = [None, None, None, None]
 path = []
@@ -189,7 +190,7 @@ while True:
                         selected[0] = loc
                 else:
                     dr, dc = r - selected[0][0], c - selected[0][1]
-                    if (abs(dc) == 1 and dr == 0) or (abs(dr) == 0.5 and dc == 0 and spacePressed):
+                    if (abs(dc) == 1 and dr == 0) or (abs(dr) == 0.5 and dc == 0 and ((spacePressed or r in [ro for (ro, co) in selected]))):
                         spacePressed = 0
                         selected = [loc] + [itm for itm in selected if itm and itm != loc]
                         if len(selected) == 5:
@@ -205,7 +206,7 @@ while True:
                                 pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
         elif selected != [None]:
             already, notyet = [itm for itm in selected if itm and itm[0] == int(itm[0])], [itm for itm in selected if itm and itm[0] != int(itm[0])]
-            if (len(notyet) == 0 and len(already) != 4) or (len(already) > 0 and [board[r][c] for (r, c) in already if board[r][c] != board[already[0][0]][already[0][1]]]):
+            if (len(notyet) == 0 and len(already) != 4) or (len(already) > 0 and [board[r][c] for (r, c) in already if board[r][c] != board[already[0][0]][already[0][1]]]) or (not [(r + 1, c) for (r, c) in already if not (r + 1, c) in selected and (r + 1 == 16 or board[r + 1][c])] and not [(int(r) + 1, c) for (r, c) in notyet if not (int(r) + 1, c) in selected and (int(r) + 1 == 16 or board[int(r) + 1][c])] and not (len(notyet) + len(already) < 4 and len(notyet) > 1 and not [r for (r, c) in notyet if r != notyet[0][0]])):
                 for itm in already:
                     pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
                     if board[itm[0]][itm[1]]:
