@@ -81,7 +81,7 @@ for loc in selected:
             pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
 for loc in tmp:
     r, c = loc
-    pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+    pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
 del tmp
 for loc in piece:
     if loc != None:
@@ -130,7 +130,7 @@ while True:
                                 pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
                     for loc in tmp:
                         r, c = loc
-                        pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+                        pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
                     del tmp
                     for loc in piece:
                         if loc != None:
@@ -235,7 +235,7 @@ while True:
                     pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
         for loc in tmp:
             r, c = loc
-            pygame.draw.rect(screen, (0, 0, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+            pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
             pygame.display.update((0, 25 * int(r) + 20, 250, 10))
         del tmp
         for loc in piece:
