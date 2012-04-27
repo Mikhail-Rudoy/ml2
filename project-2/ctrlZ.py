@@ -60,7 +60,7 @@ if not music:
 
 board = {}
 for i in range(-4, 16):
-    board[i] = [None] * 10
+    board[i] = [(200, 100, 150), (100, 200, 150)] + [None] * 8
 board[2][3]=board[3][3] = board[4][3] = board[5][3] = (70, 0, 0)
 selected = [None]
 piece = [None, None, None, None]
@@ -68,10 +68,6 @@ path = []
 numPieces = 0
 moveDelay = 30
 ticks = 30
-
-beep = pygame.mixer.Sound("Buzzer.ogg")
-mousePressed = False
-spacePressed = False
 
 screen.fill((255, 255, 255))
 tmp = []
@@ -82,7 +78,9 @@ for loc in selected:
             pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
         else:
             tmp.append(loc)
-            pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+for loc in tmp:
+    r, c = loc
+    pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
 for loc in tmp:
     r, c = loc
     pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
@@ -94,10 +92,15 @@ for loc in piece:
 del loc
 for r in range(16):
     for c in range(10):
-        if board[r][c] != None:
+        if board[r][c]:
+            print r, c, board[r][c]
             pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
 pygame.display.update()
 clock.tick(40)
+
+beep = pygame.mixer.Sound("Buzzer.ogg")
+mousePressed = False
+spacePressed = False
 
 while True:
     if paused:
@@ -131,7 +134,9 @@ while True:
                                 pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
                             else:
                                 tmp.append(loc)
-                                pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+                    for loc in tmp:
+                        r, c = loc
+                        pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
                     for loc in tmp:
                         r, c = loc
                         pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
@@ -172,7 +177,10 @@ while True:
                             selected[0] = loc
                         else:
                             dr, dc =  r - selected[0][0], c - selected[0][1]
-                            if (abs(dr) <= 1.000001 and dc == 0) or \
+                            if (abs(dr) <= 0.500001 and dc == 0) or \
+                               (abs(dr) == 1 and dc == 0 and not [1 for (ro, co) in selected \
+                                                                if int(2 * ro) == r + selected[0][0] and \
+                                                                   co != c]) or \
                                (abs(dc) == 1 and dr == 0):
                                 selected = [loc] + [itm for itm in selected if itm != loc]
                                 if len(selected) == 5:
@@ -223,7 +231,8 @@ while True:
                                 pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
                                 pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
         elif selected != [None]:
-            already, notyet = [itm for itm in selected if itm and itm[0] == int(itm[0])], [itm for itm in selected if itm and itm[0] != int(itm[0])]
+            already = [itm for itm in selected if itm and itm[0] == int(itm[0])]
+            notyet = [itm for itm in selected if itm and itm[0] != int(itm[0])]
             if (len(notyet) == 0 and len(already) != 4) or \
                (len(already) > 0 and [1 for (r, c) in already \
                                         if board[r][c] != \
@@ -232,7 +241,7 @@ while True:
                                 if not (r + 1, c) in selected \
                                 if (r + 1 == 16 or \
                                     board[r + 1][c])] and \
-                not [(int(r) + 1, c) for (r, c) in notyet \ 
+                not [(int(r) + 1, c) for (r, c) in notyet \
                                      if not (int(r) + 1, c) in selected \
                                      if (int(r) + 1 == 16 or \
                                          board[int(r) + 1][c])] and \
@@ -258,16 +267,16 @@ while True:
             ticks = ticks - 1
         else:
             ticks = moveDelay
-            old, piece = piece, [(r + path[0][0], c + path[0][0], col) for (r, c, col) in piece]
-            for (r, c, col) in old:
-                pygame.draw.rect(screen, (0, 0, 0), (25 * c, 25 * r, 25, 25))
-                if board[r][c]:
-                    pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
-                pygame.display.update((25 * c, 25 * r, 25, 25))
-            path = path[1:]
-            if not [1 for (r, c, col) in piece if r >= 0]:
+            #old, piece = piece, [(r + path[0][0], c + path[0][0], col) for (r, c, col) in piece]
+            #for (r, c, col) in old:
+            #    pygame.draw.rect(screen, (0, 0, 0), (25 * c, 25 * r, 25, 25))
+            #    if board[r][c]:
+            #        pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
+            #    pygame.display.update((25 * c, 25 * r, 25, 25))
+            #path = path[1:]
+            #if not [1 for (r, c, col) in piece if r >= 0]:
                 # blah
-                pass
+            #    pass
 
         tmp = []
         for loc in selected:
@@ -280,7 +289,9 @@ while True:
                     pygame.display.update((25 * c, 25 * r, 25, 25))
                 else:
                     tmp.append(loc)
-                    pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+        for loc in tmp:
+            r, c = loc
+            pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
         for loc in tmp:
             r, c = loc
             pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
