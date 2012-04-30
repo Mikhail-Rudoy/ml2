@@ -62,7 +62,7 @@ board = {}
 for i in range(-4, 16):
     board[i] = [(200, 100, 150), (100, 200, 150)] + [None] * 8
 board[2][3]=board[3][3] = board[4][3] = board[5][3] = (70, 0, 0)
-selected = [None]
+selected = []
 piece = [None, None, None, None]
 path = []
 numPieces = 0
@@ -173,8 +173,8 @@ while True:
                     loc = (y / 25, x / 25)
                     r, c = loc
                     if board[r][c]:
-                        if selected[0] == None:
-                            selected[0] = loc
+                        if not selected:
+                            selected = [loc]
                         else:
                             dr, dc =  r - selected[0][0], c - selected[0][1]
                             if (abs(dr) <= 0.500001 and dc == 0) or \
@@ -197,11 +197,11 @@ while True:
             else:
                 loc = ((y - 10) / 25 + 0.5, x / 25)
                 r, c = loc
-                if selected[0] == None:
+                if not selected:
                     if spacePressed and \
                        not [1 for i in range(int(r) + 1, 16) \
                               if board[i] == [None,] * 10]:
-                        selected[0] = loc
+                        selected = [loc]
                 else:
                     dr, dc = r - selected[0][0], c - selected[0][1]
                     if (abs(dc) == 1 and dr == 0) or \
@@ -230,7 +230,7 @@ while True:
                             else:
                                 pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
                                 pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
-        elif selected != [None]:
+        elif selected:
             already = [itm for itm in selected if itm and itm[0] == int(itm[0])]
             notyet = [itm for itm in selected if itm and itm[0] != int(itm[0])]
             if (len(notyet) == 0 and len(already) != 4) or \
@@ -258,7 +258,7 @@ while True:
                     pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
                     pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
                 beep.play()
-                selected = [None]
+                selected = []
                 
         if spacePressed:
             spacePressed = spacePressed - 1
@@ -267,17 +267,19 @@ while True:
             ticks = ticks - 1
         else:
             ticks = moveDelay
-            #old, piece = piece, [(r + path[0][0], c + path[0][0], col) for (r, c, col) in piece]
-            #for (r, c, col) in old:
-            #    pygame.draw.rect(screen, (0, 0, 0), (25 * c, 25 * r, 25, 25))
-            #    if board[r][c]:
-            #        pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
-            #    pygame.display.update((25 * c, 25 * r, 25, 25))
-            #path = path[1:]
-            #if not [1 for (r, c, col) in piece if r >= 0]:
-                # blah
-            #    pass
-
+            old, piece = piece, [(r + path[0][0], c + path[0][0], col) for (r, c, col) in piece]
+            for (r, c, col) in old:
+                pygame.draw.rect(screen, (0, 0, 0), (25 * c, 25 * r, 25, 25))
+                if board[r][c]:
+                    pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
+                pygame.display.update((25 * c, 25 * r, 25, 25))
+            path = path[1:]
+            if not [1 for (r, c, col) in piece if r >= 0]:
+                if not selected:
+                    pass
+                else:
+                    pass
+                
         tmp = []
         for loc in selected:
             if loc != None:
@@ -323,7 +325,7 @@ while True:
                     for itm in notyet:
                         pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
                         pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
-                    selected = [None]
+                    selected = []
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     mousePressed = False
