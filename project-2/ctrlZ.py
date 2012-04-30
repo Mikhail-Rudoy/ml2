@@ -53,6 +53,9 @@ while True:
     clock.tick(4)
     del event
 
+while pygame.event.poll().type != NOEVENT:
+    pass
+
 pygame.mixer.music.load("song.wav")
 pygame.mixer.music.play(-1)
 if not music:
