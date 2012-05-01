@@ -333,8 +333,9 @@ while True:
                     path = generatePath(board, piece)
                     if path == -1 or board[-1] != [None] * 10:
                         break
-                elif len(selected) == 2 and not [1 for (r, c) in selected if int(r) == r]:
+                elif len(selected) == 2 and len([1 for (r, c) in selected if int(r) == r]) == 1:
                     
+                        
 
                 #
                 #
