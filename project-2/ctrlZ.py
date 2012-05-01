@@ -1,17 +1,40 @@
-import pygame, sys
+import pygame, sys, random
 
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((250, 400))
 clock = pygame.time.Clock()
+
+white = (255, 255, 255)
+black = (0, 0, 0)
+blockSelectionColor = (0, 155, 255)
+lineSelectionColor = (0, 200, 0)
+spaceSelectionColor = (0, 155, 255)
+
+def colorBoard(brd, locs, clrs):
+    random.shuffle(locs)
+    for (r, c) in locs:
+        if random.choice([1, 0]):
+            brd[r][c] = random.choice(clrs)
+        else:
+            neigbors = [brd[r + ro][c + co] for (ro, co) in [(-1, 0), (1, 0), (0, 1), (0, -1)] \
+                                            if r + ro < 16 and r + ro > -5 \
+                                            if c + co < 10 and c + co >= 0 \
+                                            if brd[r + ro, c + co]]
+            if len(neighbors):
+                brd[r][c] = random.choice(neighbors)
+            else:
+                brd[r][c] = random.choice(clrs)
+        
 
 pygame.display.set_caption("Ctrl-Z")
 
 paused = 0
-pauseText = pygame.font.Font(None, 35).render("Press \"p\" to unpause", True, (255, 255, 255))
+pauseText = pygame.font.Font(None, 35).render("Press \"p\" to unpause", True, white)
 
-screen.fill((255, 255, 255))
+screen.fill(white)
 screen.blit(pygame.image.load("title.gif").convert(), (0, 90))
-screen.blit(pygame.font.Font(None, 40).render("By Mikhail Rudoy", True, (0, 0, 0)), (7, 210))
+screen.blit(pygame.font.Font(None, 40).render("By Mikhail Rudoy", True, black), (7, 210))
 pygame.display.update()
 
 music = True
@@ -53,7 +76,7 @@ while True:
     clock.tick(4)
     del event
 
-while pygame.event.poll().type != NOEVENT:
+while pygame.event.poll().type != pygame.NOEVENT:
     pass
 
 pygame.mixer.music.load("song.wav")
@@ -63,30 +86,37 @@ if not music:
 
 board = {}
 for i in range(-4, 16):
-    board[i] = [(200, 100, 150), (100, 200, 150)] + [None] * 8
-board[2][3]=board[3][3] = board[4][3] = board[5][3] = (70, 0, 0)
+    board[i] = [(50, 100, 0), (100, 0, 50)] + [None] * 8
 selected = []
 piece = [None, None, None, None]
 path = []
 numPieces = 0
 moveDelay = 30
 ticks = 30
+colorRange = 2
+colors = [(r, g, b) for r in range(0, 255, 50) \
+                    for g in range(0, 255, 50) \
+                    for b in range(0, 255, 50) \
+                    if r != g and g != b and r != b]
+random.shuffle(colors)
+colors = colors[:10]
 
-screen.fill((255, 255, 255))
+
+screen.fill(white)
 tmp = []
 for loc in selected:
     if loc != None:
         r, c = loc
         if r == int(r):
-            pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+            pygame.draw.rect(screen, blockSelectionColor, (25 * c, 25 * r, 25, 25))
         else:
             tmp.append(loc)
 for loc in tmp:
     r, c = loc
-    pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+    pygame.draw.rect(screen, lineSelectionColor, (0, 25 * int(r) + 22, 250, 6))
 for loc in tmp:
     r, c = loc
-    pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+    pygame.draw.rect(screen, spaceSelectionColor, (25 * c, 25 * int(r) + 20, 25, 10))
 del tmp
 for loc in piece:
     if loc != None:
@@ -96,7 +126,6 @@ del loc
 for r in range(16):
     for c in range(10):
         if board[r][c]:
-            print r, c, board[r][c]
             pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
 pygame.display.update()
 clock.tick(40)
@@ -108,7 +137,7 @@ spacePressed = False
 while True:
     if paused:
         if paused == 1:
-            screen.fill((0, 0, 0))
+            screen.fill(black)
             screen.blit(pauseText, (1, 170))
             paused = 2
             pygame.display.update()
@@ -128,21 +157,21 @@ while True:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     paused = 0
-                    screen.fill((255, 255, 255))
+                    screen.fill(white)
                     tmp = []
                     for loc in selected:
                         if loc != None:
                             r, c = loc
                             if r == int(r):
-                                pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+                                pygame.draw.rect(screen, blockSelectionColor, (25 * c, 25 * r, 25, 25))
                             else:
                                 tmp.append(loc)
                     for loc in tmp:
                         r, c = loc
-                        pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+                        pygame.draw.rect(screen, lineSelectionColor, (0, 25 * int(r) + 22, 250, 6))
                     for loc in tmp:
                         r, c = loc
-                        pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+                        pygame.draw.rect(screen, spaceSelectionColor, (25 * c, 25 * int(r) + 20, 25, 10))
                     del tmp
                     for loc in piece:
                         if loc != None:
@@ -190,12 +219,12 @@ while True:
                                     itm = selected[4]
                                     selected = selected[:4]
                                     if itm[0] == int(itm[0]):
-                                        pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                                        pygame.draw.rect(screen, white, (25 * itm[1], 25 * itm[0], 25, 25))
                                         if board[itm[0]][itm[1]]:
                                             pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
                                         pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
                                     else:
-                                        pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                                        pygame.draw.rect(screen, white, (0, 25 * int(itm[0]) + 20, 250, 10))
                                         pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
             else:
                 loc = ((y - 10) / 25 + 0.5, x / 25)
@@ -226,12 +255,12 @@ while True:
                             itm = selected[4]
                             selected = selected[:4]
                             if itm[0] == int(itm[0]):
-                                pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                                pygame.draw.rect(screen, white, (25 * itm[1], 25 * itm[0], 25, 25))
                                 if board[itm[0]][itm[1]]:
                                     pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
                                 pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
                             else:
-                                pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                                pygame.draw.rect(screen, white, (0, 25 * int(itm[0]) + 20, 250, 10))
                                 pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
         elif selected:
             already = [itm for itm in selected if itm and itm[0] == int(itm[0])]
@@ -253,12 +282,12 @@ while True:
                      not [r for (r, c) in notyet \
                             if r != notyet[0][0]])):
                 for itm in already:
-                    pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                    pygame.draw.rect(screen, white, (25 * itm[1], 25 * itm[0], 25, 25))
                     if board[itm[0]][itm[1]]:
                         pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
                     pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
                 for itm in notyet:
-                    pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                    pygame.draw.rect(screen, white, (0, 25 * int(itm[0]) + 20, 250, 10))
                     pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
                 beep.play()
                 selected = []
@@ -272,23 +301,71 @@ while True:
             ticks = moveDelay
             old, piece = piece, [(r + path[0][0], c + path[0][0], col) for (r, c, col) in piece]
             for (r, c, col) in old:
-                pygame.draw.rect(screen, (0, 0, 0), (25 * c, 25 * r, 25, 25))
+                pygame.draw.rect(screen, black, (25 * c, 25 * r, 25, 25))
                 if board[r][c]:
                     pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
                 pygame.display.update((25 * c, 25 * r, 25, 25))
             path = path[1:]
             if not [1 for (r, c, col) in piece if r >= 0]:
-                if not selected:
-                    pass
-                else:
-                    pass
+                numPieces = numPieces + 1
+                if moveDelay > 4 and numPieces % 2 == 0:
+                    moveDelay = moveDelay - 1
+                if colorRange < len(colors) and numPieces % 6 == 0:
+                    colorRange = colorRange + 1
+                if mousePressed:
+                    selected = []
+                    break
+                if len(selected) == 1 and selected[0][0] != int(selected[0][0]):
+                    r, c = selected[0]
+                    locs = [(ro + int(r) - 3, co) for ro in range(4) for co in range(10) if co != c]
+                    newBoard = {}
+                    for i in range(-4, int(r) - 3):
+                        newBoard[i] = board[i + 4]
+                    for i in range(int(r) - 3, int(r) + 1):
+                        newBoard[i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoard[i] = board[i]
+                        
+                    colorBoard(newBoard, locs, colors[:colorRange])
+                    board = newBoard
+                    col = random.choice(colors[:colorRange])
+                    piece = [(ro, c, col) for ro in range(int(r) - 3, int(r) + 1)]
+                    path = generatePath(board, piece)
+                    if path == -1 or board[-1] != [None] * 10:
+                        break
+                elif len(selected) == 2 and not [1 for (r, c) in selected if int(r) == r]:
+                    
+
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+
+                    
                 
         tmp = []
         for loc in selected:
             if loc != None:
                 r, c = loc
                 if r == int(r):
-                    pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * r, 25, 25))
+                    pygame.draw.rect(screen, blockSelectionColor, (25 * c, 25 * r, 25, 25))
                     if board[r][c]:
                         pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
                     pygame.display.update((25 * c, 25 * r, 25, 25))
@@ -296,10 +373,10 @@ while True:
                     tmp.append(loc)
         for loc in tmp:
             r, c = loc
-            pygame.draw.rect(screen, (0, 200, 0), (0, 25 * int(r) + 22, 250, 6))
+            pygame.draw.rect(screen, lineSelectionColor, (0, 25 * int(r) + 22, 250, 6))
         for loc in tmp:
             r, c = loc
-            pygame.draw.rect(screen, (0, 155, 255), (25 * c, 25 * int(r) + 20, 25, 10))
+            pygame.draw.rect(screen, spaceSelectionColor, (25 * c, 25 * int(r) + 20, 25, 10))
             pygame.display.update((0, 25 * int(r) + 20, 250, 10))
         del tmp
         for loc in piece:
@@ -321,12 +398,12 @@ while True:
                     mousePressed = True
                     already, notyet = [itm for itm in selected if itm and itm[0] == int(itm[0])], [itm for itm in selected if itm and itm[0] != int(itm[0])]
                     for itm in already:
-                        pygame.draw.rect(screen, (255, 255, 255), (25 * itm[1], 25 * itm[0], 25, 25))
+                        pygame.draw.rect(screen, white, (25 * itm[1], 25 * itm[0], 25, 25))
                         if board[itm[0]][itm[1]]:
                             pygame.draw.rect(screen, board[itm[0]][itm[1]], (5 + 25 * itm[1], 5 + 25 * itm[0], 15, 15))
                         pygame.display.update((25 * itm[1], 25 * itm[0], 25, 25))
                     for itm in notyet:
-                        pygame.draw.rect(screen, (255, 255, 255), (0, 25 * int(itm[0]) + 20, 250, 10))
+                        pygame.draw.rect(screen, white, (0, 25 * int(itm[0]) + 20, 250, 10))
                         pygame.display.update((0, 25 * int(itm[0]) + 20, 250, 10))
                     selected = []
             elif event.type == pygame.MOUSEBUTTONUP:
