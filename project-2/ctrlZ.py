@@ -61,15 +61,15 @@ while True:
             sys.exit()
         else:
             if music:
-                pygame.mixer.music.fadeout(1500)
+                pygame.mixer.music.fadeout(500)
             else:
-                pygame.time.wait(1500)
+                pygame.time.wait(500)
             break
     elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
         if music:
-            pygame.mixer.music.fadeout(1500)
+            pygame.mixer.music.fadeout(500)
         else:
-            pygame.time.wait(1500)
+            pygame.time.wait(500)
         break
     else:
         continue
@@ -393,30 +393,118 @@ while True:
                     locs = [(ro + int(r) - 2, co) for ro in range(3) for co in range(10) if co != c1 and not (ro == r and co == c0)]
                     colorBoard(newBoards[2], locs, colors[:colorRange])
                     
-
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-                #
-
+                    pieces = [[], [], []]
+                    pieces[0] = [(ro, co) for ro in range(int(r) - 1, int(r)) for co in [c0, c1]]
+                    pieces[1] = [(r, c1)] + [(ro, c0) for ro in range(int(r) - 2, int(r))]
+                    pieces[2] = [(r, c0)] + [(ro, c1) for ro in range(int(r) - 2, int(r))]
                     
+                    paths = [[], [], []]
+                    paths[0] = generatePath(newBoards[0], pieces[0])
+                    paths[1] = generatePath(newBoards[1], pieces[1])
+                    paths[2] = generatePath(newBoards[2], pieces[2])
+                    
+                    if not [i for i in range(3) if paths[i] != -1] or board[-1] != [None] * 10:
+                        i = random.randrange(3)
+                        piece = pieces[i]
+                        board = newBoards[i]
+                        break
+                    
+                    i = random.choice([i for i in range(3) if paths[i] != -1])
+                    piece = pieces[i]
+                    board = newBoards[i]
+                    path = paths[i]
+                elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 0:
+                    r = selected[0][0]
+                    c0 = selected[0][1]
+                    c1 = selected[1][1]
+                    c2 = selected[2][1]
+                    
+                    pieces = [[], [], []]
+                    pieces[0] = [(r, c0)] + [(int(r) - 1, co) for co in [c0, c1, c2]]
+                    pieces[1] = [(r, c1)] + [(int(r) - 1, co) for co in [c0, c1, c2]]
+                    pieces[2] = [(r, c2)] + [(int(r) - 1, co) for co in [c0, c1, c2]]
+                    
+                    
+                    newBoards = [{}, {}, {}]
+                    for i in range(-4, int(r) - 1):
+                        newBoards[0][i] = board[i + 2]
+                    for i in range(int(r) - 1, int(r) + 1):
+                        newBoards[0][i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoards[0][i] = board[i]
+                    locs = [(ro + int(r) - 1, co) for ro in range(2) for co in range(10) if not (ro + int(r) - 1, co) in pieces[0]]
+                    colorBoard(newBoards[0], locs, colors[:colorRange])
+
+                    for i in range(-4, int(r) - 1):
+                        newBoards[1][i] = board[i + 3]
+                    for i in range(int(r) - 1, int(r) + 1):
+                        newBoards[1][i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoards[1][i] = board[i]
+                    locs = [(ro + int(r) - 1, co) for ro in range(2) for co in range(10) if not (ro + int(r) - 1, co) in pieces[1]]
+                    colorBoard(newBoards[1], locs, colors[:colorRange])
+
+                    for i in range(-4, int(r) - 1):
+                        newBoards[2][i] = board[i + 3]
+                    for i in range(int(r) - 1, int(r) + 1):
+                        newBoards[2][i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoards[2][i] = board[i]
+                    locs = [(ro + int(r) - 1, co) for ro in range(2) for co in range(10) if not (ro + int(r) - 1, co) in pieces[2]]
+                    colorBoard(newBoards[2], locs, colors[:colorRange])
+                    
+                    
+                    paths = [[], [], []]
+                    paths[0] = generatePath(newBoards[0], pieces[0])
+                    paths[1] = generatePath(newBoards[1], pieces[1])
+                    paths[2] = generatePath(newBoards[2], pieces[2])
+                    
+                    if not [i for i in range(3) if paths[i] != -1] or board[-1] != [None] * 10:
+                        i = random.randrange(3)
+                        piece = pieces[i]
+                        board = newBoards[i]
+                        break
+                    
+                    i = random.choice([i for i in range(3) if paths[i] != -1])
+                    piece = pieces[i]
+                    board = newBoards[i]
+                    path = paths[i]
+                elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 1 and len(set([r for (r, c) in selected])) == 2:
+                    [(blockr, blockc)] = [(r, c) for (r, c) in selected if r == int(r)]
+                    [c0, c1] = [c for (r, c) in selected if r != blockr]
+                    [r] = [r for (r, c) in selected if r != blockr]
+                    if blockr > r:
+                        pass #!
+                    else:
+                        pass #!
+                elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 1:
+                    pass #!
+                elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 2:
+                    pass #!
+                elif len(selected) == 4:
+                    pass #!
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                #
+                while pygame.event.poll().type != pygame.NOEVENT:
+                    pass
                 
         tmp = []
         for loc in selected:
@@ -485,3 +573,5 @@ while True:
                     sys.exit()
         del event
         clock.tick(40)
+
+pygame.time.wait(500)
