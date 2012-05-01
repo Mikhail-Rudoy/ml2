@@ -419,10 +419,11 @@ while True:
                     c1 = selected[1][1]
                     c2 = selected[2][1]
                     
+                    col = random.choice(colors[:colorRange])
                     pieces = [[], [], []]
-                    pieces[0] = [(r, c0)] + [(int(r) - 1, co) for co in [c0, c1, c2]]
-                    pieces[1] = [(r, c1)] + [(int(r) - 1, co) for co in [c0, c1, c2]]
-                    pieces[2] = [(r, c2)] + [(int(r) - 1, co) for co in [c0, c1, c2]]
+                    pieces[0] = [(r, c0, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
+                    pieces[1] = [(r, c1, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
+                    pieces[2] = [(r, c2, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
                     
                     
                     newBoards = [{}, {}, {}]
@@ -474,7 +475,22 @@ while True:
                     [c0, c1] = [c for (r, c) in selected if r != blockr]
                     [r] = [r for (r, c) in selected if r != blockr]
                     if blockr > r:
-                        pass #!
+                        locs = [(ro + int(r) - 1, co) for ro in range(2) for co in range(10) if co != blockc and (not co in [c0, c1] or ro != 0)]
+                        newBoard = {}
+                        for i in range(-4, int(r) - 1):
+                            newBoard[i] = board[i + 2]
+                        for i in range(int(r) - 1, int(r) + 1):
+                            newBoard[i] = [None] * 10
+                        for i in range(int(r) + 1, 16):
+                            newBoard[i] = board[i]
+                        
+                        colorBoard(newBoard, locs, colors[:colorRange])
+                        board = newBoard
+                        col = board[boardr][boardc]
+                        piece = [(boardr, boardc, col)] + [(ro, c, col) for ro in range(int(r) - 3, int(r) + 1)]
+                        path = generatePath(board, piece)
+                        if path == -1 or board[-1] != [None] * 10:
+                            break
                     else:
                         pass #!
                 elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 1:
