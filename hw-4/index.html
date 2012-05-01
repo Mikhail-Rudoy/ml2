@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+  <head>  
+    <title>mrudoy home</title>
+    <script>
+      window.onload = function()
+      {
+      setTimeout("redirect();", 7000)
+      }
+      function redirect()
+      {
+      var locations = new Array();
+      locations.push("http://www.w3schools.com/");
+      locations.push("http://codingbat.com/");
+      locations.push("http://google.com/");
+      window.location = locations[Math.floor(Math.random() * locations.length)];
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>Welcome!</h1>
+    <p>I'm having website designer's block, so...</p>
+  </body>
+
+</html>
