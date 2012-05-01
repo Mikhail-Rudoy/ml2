@@ -334,8 +334,65 @@ while True:
                     if path == -1 or board[-1] != [None] * 10:
                         break
                 elif len(selected) == 2 and len([1 for (r, c) in selected if int(r) == r]) == 1:
+                    c = selected[0][1]
+                    r0 = selected[0][0]
+                    r1 = selected[1][0]
+                    if int(r0) == r0:
+                        r0, r1 = r1, r0
+                    if r1 < r0:
+                        r1 = r1 - 3
+                    newBoard = {}
+                    for i in range(-4, int(r0) - 2):
+                        newBoard[i] = board[i + 3]
+                    for i in range(int(r0) - 2, int(r0) + 1):
+                        newBoard[i] = [None] * 10
+                    for i in range(int(r0) + 1, 16):
+                        newBoard[i] = board[i]
                     
-                        
+                    locs = [(ro + int(r0) - 2, co) for ro in range(3) for co in range(10) if co != c]
+                    
+                    colorBoard(newBoard, locs, colors[:colorRange])
+                    board = newBoard
+                    col = board[r1][c]
+                    board[r1][c] = None
+                    piece = [(r1, c, col)] + [(ro, c, col) for ro in range(int(r) - 2, int(r) + 1)]
+                    path = generatePath(board, piece)
+                    if path == -1 or board[-1] != [None] * 10:
+                        break
+                elif len(selected) == 2 and len([1 for (r, c) in selected if int(r) == r]) == 0:
+                    r = selected[0][0]
+                    c0 = selected[0][1]
+                    c1 = selected[1][1]
+                    
+                    newBoards = [{}, {}, {}]
+                    
+                    for i in range(-4, int(r) - 1):
+                        newBoards[0][i] = board[i + 2]
+                    for i in range(int(r) - 1, int(r) + 1):
+                        newBoards[0][i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoards[0][i] = board[i]
+                    locs = [(ro + int(r) - 1, co) for ro in range(2) for co in range(10) if co != c0 and co != c1]
+                    colorBoard(newBoards[0], locs, colors[:colorRange])
+                    
+                    for i in range(-4, int(r) - 2):
+                        newBoards[1][i] = board[i + 3]
+                    for i in range(int(r) - 2, int(r) + 1):
+                        newBoards[1][i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoards[1][i] = board[i]
+                    locs = [(ro + int(r) - 2, co) for ro in range(3) for co in range(10) if co != c0 and not (ro == r and co == c1)]
+                    colorBoard(newBoards[1], locs, colors[:colorRange])
+
+                    for i in range(-4, int(r) - 2):
+                        newBoards[2][i] = board[i + 3]
+                    for i in range(int(r) - 2, int(r) + 1):
+                        newBoards[2][i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoards[2][i] = board[i]
+                    locs = [(ro + int(r) - 2, co) for ro in range(3) for co in range(10) if co != c1 and not (ro == r and co == c0)]
+                    colorBoard(newBoards[2], locs, colors[:colorRange])
+                    
 
                 #
                 #
