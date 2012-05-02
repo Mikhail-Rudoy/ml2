@@ -25,7 +25,9 @@ def colorBoard(brd, locs, clrs):
                 brd[r][c] = random.choice(neighbors)
             else:
                 brd[r][c] = random.choice(clrs)
-        
+
+def generatePath(board, piece):
+    pass #!
 
 pygame.display.set_caption("Ctrl-Z")
 
@@ -403,7 +405,7 @@ while True:
                     paths[1] = generatePath(newBoards[1], pieces[1])
                     paths[2] = generatePath(newBoards[2], pieces[2])
                     
-                    if not [i for i in range(3) if paths[i] != -1] or board[-1] != [None] * 10:
+                    if not [i for i in range(3) if paths[i] != -1 and newBoard[i][-1] == [None] * 10]:
                         i = random.randrange(3)
                         piece = pieces[i]
                         board = newBoards[i]
@@ -460,13 +462,13 @@ while True:
                     paths[1] = generatePath(newBoards[1], pieces[1])
                     paths[2] = generatePath(newBoards[2], pieces[2])
                     
-                    if not [i for i in range(3) if paths[i] != -1] or board[-1] != [None] * 10:
+                    if not [i for i in range(3) if paths[i] != -1 and newBoards[i][-1] == [None] * 10]:
                         i = random.randrange(3)
                         piece = pieces[i]
                         board = newBoards[i]
                         break
                     
-                    i = random.choice([i for i in range(3) if paths[i] != -1])
+                    i = random.choice([i for i in range(3) if paths[i] != -1 and newBoards[i][-1] == [None] * 10])
                     piece = pieces[i]
                     board = newBoards[i]
                     path = paths[i]
@@ -497,9 +499,15 @@ while True:
                         col = board[blockr][blockc]
                         board[blockr][blockc] = 0
                         blockr = blockr - 2
-                        pieces = [[], []]
-                        pieces[0] = [(blockr, blockc, col)] + #![(int(r) - 1, co, col) for co in [c0, c1, c2]]
-                        pieces[1] = [(blockr, blockc, col)] + #![(int(r) - 1, co, col) for co in [c0, c1, c2]]
+                        pieces = [[(blockr, blockc, col), \
+                                   (blockr + 1, c0, col), \
+                                   (blockr + 1, c1, col), \
+                                   (blockr + 2, c0, col)], \
+                                  [(blockr, blockc, col), \
+                                   (blockr + 1, c0, col), \
+                                   (blockr + 1, c1, col), \
+                                   (blockr + 2, c1, col)]]    
+                        
                         newBoards = [{}, {}, {}]
                         for i in range(-4, int(r) - 1):
                             newBoards[0][i] = board[i + 2]
@@ -518,11 +526,91 @@ while True:
                             newBoards[1][i] = board[i]
                         locs = [(ro + int(r) - 1, co) for ro in range(2) for co in range(10) if not (ro + int(r) - 1, co) in pieces[1]]
                         colorBoard(newBoards[1], locs, colors[:colorRange])
-
+                        
+                        paths = [[], []]
+                        paths[0] = generatePath(newBoards[0], pieces[0])
+                        paths[1] = generatePath(newBoards[1], pieces[1])
+                        
+                        if (paths[0] == -1 or newBoards[0][-1] == [None] * 10) and \
+                                (paths[1] == -1 or newBoards[1][-1] == [None] * 10):
+                            i = random.randrange(2)
+                            piece = pieces[i]
+                            board = newBoards[i]
+                            break
+                    
+                        i = random.choice([i for i in range(2) if paths[i] != -1 and newBoards[i][-1] == [None] * 10])
+                        piece = pieces[i]
+                        board = newBoards[i]
+                        path = paths[i]
                 elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 1:
-                    pass #!
+                    selected.sort()
+                    col = board[selected[1][0]][selected[0][1]]
+                    board[selected[1][0]][selected[0][1]] = None
+                    piece = [(selected[1][0] - 3 + r, selected[0][1]) for r in range(4)]
+                    r = selected[1][0]
+                    c = selected[0][1]
+                    newBoards = [{}, {}]
+                    for i in range(-4, r - 3):
+                        newBoards[0][i] = board[i + 3]
+                        newBoards[1][i] = board[i + 3]
+                    for i in range(r - 3, r + 1):
+                        newBoard[0][i] = [None] * 10
+                        newBoard[1][i] = [None] * 10
+                    for i in range(r + 1, 16):
+                        newBoards[0][i] = board[i]
+                        newBoards[1][i] = board[i]
+                    newBoard[0][r - 1] = board[r]
+                    newBoard[1][r - 2] = board[r]
+
+                    locs = [[(ro, co) for ro in [r - 3, r - 2, r] for co in range(10) if co != c], \
+                            [(ro, co) for ro in [r - 3, r - 1, r] for co in range(10) if co != c]]
+                    colorBoard(newBoards[0], locs[0], colors[:colorRange])
+                    colorBoard(newBoards[1], locs[1], colors[:colorRange])
+                    
+                    paths = [[], []]
+                    paths[0] = generatePath(newBoards[0], pieces[0])
+                    paths[1] = generatePath(newBoards[1], pieces[1])
+                    
+                    if (paths[0] == -1 or newBoards[0][-1] == [None] * 10) and \
+                            (paths[1] == -1 or newBoards[1][-1] == [None] * 10):
+                        i = random.randrange(2)
+                        piece = pieces[i]
+                        board = newBoards[i]
+                        break
+                    
+                    i = random.choice([i for i in range(2) if paths[i] != -1 and newBoards[i][-1] == [None] * 10])
+                    piece = pieces[i]
+                    board = newBoards[i]
+                    path = paths[i]
                 elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 2:
-                    pass #!
+                    col = [board[r][c] for (r, c) in selected if int(r) == r][0]
+                    for (ro, co) in selected:
+                        if int(ro) == ro:
+                            board[ro][co] = None
+                        else:
+                            r = ro
+                            c = co
+                    piece = [(int(r), c, col), (int(r) - 1, c, col)]
+                    for (ro, co) in selected:
+                        if int(ro) == ro:
+                            if ro > r:
+                                piece.append((ro, co, col))
+                            else:
+                                piece.append((ro - 2, co, col))
+                    newBoard = {}
+                    for i in range(-4, int(r) - 1):
+                        newBoard[i] = board[i + 2]
+                    for i in range(int(r) - 1, int(r) + 1):
+                        newBoard[i] = [None] * 10
+                    for i in range(int(r) + 1, 16):
+                        newBoard[i] = board[i]
+                    locs = [(ro, co) for ro in range(int(r) - 1, int(r) + 1) for co in range(10) if co != c]
+                    colorBoard(newBoard, locs, piece)
+                    board = newBoard
+                    
+                    path = generatePath(board, piece)
+                    if path == -1 or board[-1] != [None] * 10:
+                        break
                 elif len(selected) == 4:
                     pass #!
                 #
@@ -617,3 +705,4 @@ while True:
         clock.tick(40)
 
 pygame.time.wait(500)
+pygame.display.fill(white)
