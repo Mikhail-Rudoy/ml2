@@ -27,7 +27,141 @@ def colorBoard(brd, locs, clrs):
                 brd[r][c] = random.choice(clrs)
 
 def generatePath(board, piece):
-    pass #!
+    path = []
+    minr = piece[0][0]
+    minc = piece[0][1]
+    col = piece[0][2]
+    for (r, c, C) in piece:
+        if r < minr:
+            minr = r
+        if c < minc:
+            minc = c
+    template = set([(r - minr, c - minc) for (r, c, col) in piece])
+    if template == set([(0, 0), (0, 1), (1, 1), (1, 0)]):
+        # 
+        # 00
+        # 00
+        # 
+        pass
+    if template == set([(0, 0), (0, 1), (0, 2), (0, 3)]):
+        # 
+        # 0000
+        # 
+        pass
+    if template == set([(0, 0), (1, 0), (2, 0), (3, 0)]):
+        # 
+        # 0
+        # 0
+        # 0
+        # 0
+        # 
+        pass
+    if template == set([(0, 1), (1, 0), (1, 1), (2, 1)]):
+        # 
+        #  0
+        # 00
+        #  0
+        # 
+        pass
+    if template == set([(0, 0), (0, 1), (0, 2), (1, 1)]):
+        # 
+        # 000
+        #  0
+        # 
+        pass
+    if template == set([(0, 0), (1, 0), (1, 1), (2, 0)]):
+        # 
+        # 0
+        # 00
+        # 0
+        # 
+        pass
+    if template == set([(0, 1), (1, 0), (1, 1), (1, 2)]):
+        # 
+        #  0
+        # 000
+        # 
+        pass
+    if template == set([(0, 0), (1, 0), (2, 0), (2, 1)]):
+        # 
+        # 0
+        # 0
+        # 00
+        # 
+        pass
+    if template == set([(0, 2), (1, 0), (1, 1), (1, 2)]):
+        # 
+        #   0
+        # 000
+        # 
+        pass
+    if template == set([(0, 0), (0, 1), (1, 1), (2, 1)]):
+        # 
+        # 00
+        #  0
+        #  0
+        # 
+        pass
+    if template == set([(0, 0), (0, 1), (0, 2), (1, 0)]):
+        # 
+        # 000
+        # 0
+        # 
+        pass
+    if template == set([(0, 0), (0, 1), (1, 0), (2, 0)]):
+        # 
+        # 00
+        # 0
+        # 0
+        # 
+        pass
+    if template == set([(0, 0), (1, 0), (1, 1), (1, 2)]):
+        # 
+        # 0
+        # 000
+        # 
+        pass
+    if template == set([(0, 1), (1, 1), (2, 0), (2, 1)]):
+        # 
+        #  0
+        #  0
+        # 00
+        # 
+        pass
+    if template == set([(0, 0), (0, 1), (0, 2), (1, 2)]):
+        # 
+        # 000
+        #   0
+        # 
+        pass
+    if template == set([(0, 0), (0, 1), (1, 1), (1, 2)]):
+        # 
+        # 00
+        #  00
+        # 
+        pass
+    if template == set([(0, 1), (1, 0), (1, 1), (2, 0)]):
+        # 
+        #  0
+        # 00
+        # 0
+        # 
+        pass
+    if template == set([(0, 1), (0, 2), (1, 0), (1, 1)]):
+        # 
+        #  00
+        # 00
+        # 
+        pass
+    if template == set([(0, 0), (1, 0), (1, 1), (2, 1)]):
+        # 
+        # 0
+        # 00
+        #  0
+        # 
+        pass
+    
+    
 
 pygame.display.set_caption("Ctrl-Z")
 
@@ -301,7 +435,7 @@ while True:
             ticks = ticks - 1
         else:
             ticks = moveDelay
-            old, piece = piece, [(r + path[0][0], c + path[0][0], col) for (r, c, col) in piece]
+            old, piece = piece, path[0]
             for (r, c, col) in old:
                 pygame.draw.rect(screen, black, (25 * c, 25 * r, 25, 25))
                 if board[r][c]:
