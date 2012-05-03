@@ -8,7 +8,7 @@ clock = pygame.time.Clock()
 white = (255, 255, 255)
 black = (0, 0, 0)
 blockSelectionColor = (0, 155, 255)
-lineSelectionColor = (0,1 200, 0)
+lineSelectionColor = (0, 200, 0)
 spaceSelectionColor = (0, 155, 255)
 
 def colorBoard(brd, locs, clrs):
