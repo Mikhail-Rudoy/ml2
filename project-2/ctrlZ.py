@@ -652,7 +652,6 @@ while 1:
 	                    for b in range(0, 255, 75) \
 	                    if r != g and g != b and r != b]
 	random.shuffle(colors)
-        print len(colors)
 	colors = colors[:10]
 	
 	avoid = [random.randrange(10) for r in range(8, 16)]
@@ -1134,7 +1133,6 @@ while 1:
 	                    piece = [(selected[1][0] - 3 + r, selected[0][1], col) for r in range(4)]
 	                    r = selected[1][0]
 	                    c = selected[0][1]
-	                    print r, c
 	                    newBoards = [{}, {}]
 	                    for i in range(-4, r - 3):
 	                        newBoards[0][i] = board[i + 3]
