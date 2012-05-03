@@ -922,7 +922,7 @@ while 1:
 	            if not [1 for (r, c, col) in piece if r >= 0]:
 	                numPieces = numPieces + 1
 	                if moveDelay == 30:
-	                    moveDelay = 15
+	                    moveDelay = 10
 	                if moveDelay > 2 and numPieces % 2 == 0:
 	                    moveDelay = moveDelay - 1
 	                if colorRange < len(colors) and numPieces % 6 == 0:
