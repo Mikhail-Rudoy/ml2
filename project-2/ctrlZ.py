@@ -39,7 +39,7 @@ startData = [None] * 7
 #  | | | |
 #  \_/ \_/
 #
-shapes[0] = [[set([(0, 0), (0, 1), (1, 0), (1, 1)])]]
+shapes[0] = [set([(0, 0), (0, 1), (1, 0), (1, 1)])]
 displacement[0] = [(0, 0)]
 startData[0] = (-2, 4, 0)
 
@@ -413,11 +413,11 @@ def getPath(board, r, c, t, o, col):
     isValid = lambda rparam, cparam: rparam >= -4 and rparam < 16 and cparam >= 0 and cparam < 10
 
     neighbors = []
-    heapq.heappush(neighbors, (dist(ri, ci, oi), ri, ci, oi, 4, 0))
+    heapq.heappush(neighbors, (dist(ri, ci, oi), 1 - ri + random.randrange(5), abs(abs(oi - o) - 2), ri, ci, oi, 4, 0))
     space[oi][ri][ci] = 4
     success = False
     while neighbors:
-        priority, ri, ci, oi, numonlevel, sofar = heapq.heappop(neighbors)
+        priority, greed, turn, ri, ci, oi, numonlevel, sofar = heapq.heappop(neighbors)
         if dist(ri, ci, oi) == 0:
             success = True
             break
@@ -432,7 +432,7 @@ def getPath(board, r, c, t, o, col):
                     go = False
             if go:
                 space[oi][ri + 1][ci] = 0
-                heapq.heappush(neighbors, (sofar + 1 + dist(ri + 1, ci, oi), ri + 1, ci, oi, 0, sofar + 1))
+                heapq.heappush(neighbors, (sofar + 1 + dist(ri + 1, ci, oi), 0  - ri + random.randrange(5), abs(abs(oi - o) - 2), ri + 1, ci, oi, 0, sofar + 1))
             
         if numonlevel != 4:
             if ci < 9 and (space[oi][ri][ci + 1] == None or space[oi][ri][ci + 1] >  numonlevel + 1):
@@ -445,7 +445,7 @@ def getPath(board, r, c, t, o, col):
                         go = False
                 if go:
                     space[oi][ri][ci + 1] = numonlevel + 1
-                    heapq.heappush(neighbors, (sofar + 1 + dist(ri, ci + 1, oi), ri, ci + 1, oi, numonlevel + 1, sofar + 1))
+                    heapq.heappush(neighbors, (sofar + 1 + dist(ri, ci + 1, oi), 1 - ri + random.randrange(5), abs(abs(oi - o) - 2), ri, ci + 1, oi, numonlevel + 1, sofar + 1))
             if ci > 0 and (space[oi][ri][ci - 1] == None or space[oi][ri][ci - 1] >  numonlevel + 1):
                 go = True
                 for (pr, pc) in shapes[t][oi]:
@@ -456,7 +456,7 @@ def getPath(board, r, c, t, o, col):
                         go = False
                 if go:
                     space[oi][ri][ci - 1] = numonlevel + 1
-                    heapq.heappush(neighbors, (sofar + 1 + dist(ri, ci - 1, oi), ri, ci - 1, oi, numonlevel + 1, sofar + 1))
+                    heapq.heappush(neighbors, (sofar + 1 + dist(ri, ci - 1, oi), 1 - ri + random.randrange(5), abs(abs(oi - o) - 2), ri, ci - 1, oi, numonlevel + 1, sofar + 1))
             if t != 0:
                 dr = displacement[t][(oi + 1) % 4][0] - displacement[t][oi][0]
                 dc = displacement[t][(oi + 1) % 4][1] - displacement[t][oi][1]
@@ -470,7 +470,7 @@ def getPath(board, r, c, t, o, col):
                             go = False
                     if go:
                         space[(oi + 1) % 4][dr + ri][dc + ci] = numonlevel + 1
-                        heapq.heappush(neighbors, (sofar + 3 + dist(ri + dr, ci + dc, (oi + 1) % 4), ri + dr, ci + dc, (oi + 1) % 4, numonlevel + 1, sofar + 3))
+                        heapq.heappush(neighbors, (sofar + 3 + dist(ri + dr, ci + dc, (oi + 1) % 4), 1 - ri - dr + random.randrange(5), abs(abs((oi + 1) % 4 - o) - 2), ri + dr, ci + dc, (oi + 1) % 4, numonlevel + 1, sofar + 3))
                 dr = displacement[t][(oi - 1) % 4][0] - displacement[t][oi][0]
                 dc = displacement[t][(oi - 1) % 4][1] - displacement[t][oi][1]
                 if isValid(ri + dr, ci + dc) and (space[(oi - 1) % 4][ri + dr][ci + dc] == None or space[(oi - 1) % 4][ri + dr][ci + dc] > numonlevel + 1):
@@ -483,7 +483,7 @@ def getPath(board, r, c, t, o, col):
                             go = False
                     if go:
                         space[(oi - 1) % 4][dr + ri][dc + ci] = numonlevel + 1
-                    heapq.heappush(neighbors, (sofar + 3 + dist(ri + dr, ci + dc, (oi - 1) % 4), ri + dr, ci + dc, (oi - 1) % 4, numonlevel + 1, sofar + 3))
+                        heapq.heappush(neighbors, (sofar + 3 + dist(ri + dr, ci + dc, (oi - 1) % 4), 1 - ri - dr + random.randrange(5), abs(abs((oi - 1) % 4 - o) - 2), ri + dr, ci + dc, (oi - 1) % 4, numonlevel + 1, sofar + 3))
     
     if not success:
         return -1
@@ -510,21 +510,21 @@ def getPath(board, r, c, t, o, col):
             continue
         dr = displacement[t][(o + 1) % 4][0] - displacement[t][o][0]
         dc = displacement[t][(o + 1) % 4][1] - displacement[t][o][1]
-        if isValid(r + dr, c + dc) and space[(o + 1) % 4][r + dr][c + dc] == numonlevel - 1:
+        if t > 0 and isValid(r + dr, c + dc) and space[(o + 1) % 4][r + dr][c + dc] == numonlevel - 1:
             o = (o + 1) % 4
             r = r + dr
             c = c + dc
             continue
         dr = displacement[t][(o - 1) % 4][0] - displacement[t][o][0]
         dc = displacement[t][(o - 1) % 4][1] - displacement[t][o][1]
-        if isValid(r + dr, c + dc) and space[(o - 1) % 4][r + dr][c + dc] == numonlevel - 1:
+        if t > 0 and isValid(r + dr, c + dc) and space[(o - 1) % 4][r + dr][c + dc] == numonlevel - 1:
             o = (o - 1) % 4
             r = r + dr
             c = c + dc
             continue
     
     path.append([(r + dr, c + dc, col) for (dr, dc) in shapes[t][o]])
-    print [(r + dr, c + dc, col) for (dr, dc) in shapes[t][o]]
+    path.append([(r + dr, c + dc, col) for (dr, dc) in shapes[t][o]])
     return path
 
 pygame.display.set_caption("Ctrl-Z")
@@ -836,6 +836,7 @@ while True:
                     piece = [(ro, c, col) for ro in range(int(r) - 3, int(r) + 1)]
                     path = generatePath(board, piece)
                     if path == -1 or board[-1] != [None] * 10:
+                        selected = []
                         break
                 elif len(selected) == 2 and len([1 for (r, c) in selected if int(r) == r]) == 1:
                     c = selected[0][1]
@@ -859,9 +860,10 @@ while True:
                     board = newBoard
                     col = board[r1][c]
                     board[r1][c] = None
-                    piece = [(r1, c, col)] + [(ro, c, col) for ro in range(int(r) - 2, int(r) + 1)]
+                    piece = [(r1, c, col)] + [(ro, c, col) for ro in range(int(r0) - 2, int(r0) + 1)]
                     path = generatePath(board, piece)
                     if path == -1 or board[-1] != [None] * 10:
+                        selected = []
                         break
                 elif len(selected) == 2 and len([1 for (r, c) in selected if int(r) == r]) == 0:
                     r = selected[0][0]
@@ -885,7 +887,7 @@ while True:
                         newBoards[1][i] = [None] * 10
                     for i in range(int(r) + 1, 16):
                         newBoards[1][i] = board[i]
-                    locs = [(ro + int(r) - 2, co) for ro in range(3) for co in range(10) if co != c0 and not (ro == r and co == c1)]
+                    locs = [(ro + int(r) - 2, co) for ro in range(3) for co in range(10) if co != c0 and not (ro == 0 and co == c1)]
                     colorBoard(newBoards[1], locs, colors[:colorRange])
 
                     for i in range(-4, int(r) - 2):
@@ -894,14 +896,14 @@ while True:
                         newBoards[2][i] = [None] * 10
                     for i in range(int(r) + 1, 16):
                         newBoards[2][i] = board[i]
-                    locs = [(ro + int(r) - 2, co) for ro in range(3) for co in range(10) if co != c1 and not (ro == r and co == c0)]
+                    locs = [(ro + int(r) - 2, co) for ro in range(3) for co in range(10) if co != c1 and not (ro == 0 and co == c0)]
                     colorBoard(newBoards[2], locs, colors[:colorRange])
                     
                     col = random.choice(colors[:colorRange])
                     pieces = [[], [], []]
-                    pieces[0] = [(ro, co, col) for ro in range(int(r) - 1, int(r)) for co in [c0, c1]]
-                    pieces[1] = [(r, c1, col)] + [(ro, c0, col) for ro in range(int(r) - 2, int(r))]
-                    pieces[2] = [(r, c0, col)] + [(ro, c1, col) for ro in range(int(r) - 2, int(r))]
+                    pieces[0] = [(ro, co, col) for ro in [int(r) - 1, int(r)] for co in [c0, c1]]
+                    pieces[1] = [(int(r) - 2, c1, col)] + [(ro, c0, col) for ro in range(int(r) - 2, int(r) + 1)]
+                    pieces[2] = [(int(r) - 2, c0, col)] + [(ro, c1, col) for ro in range(int(r) - 2, int(r) + 1)]
                     
                     paths = [[], [], []]
                     paths[0] = generatePath(newBoards[0], pieces[0])
@@ -909,6 +911,7 @@ while True:
                     paths[2] = generatePath(newBoards[2], pieces[2])
                     
                     if not [i for i in range(3) if paths[i] != -1 and newBoard[i][-1] != [None] * 10]:
+                        selected = []
                         i = random.randrange(3)
                         piece = pieces[i]
                         board = newBoards[i]
@@ -926,9 +929,9 @@ while True:
                     
                     col = random.choice(colors[:colorRange])
                     pieces = [[], [], []]
-                    pieces[0] = [(r, c0, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
-                    pieces[1] = [(r, c1, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
-                    pieces[2] = [(r, c2, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
+                    pieces[0] = [(int(r), c0, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
+                    pieces[1] = [(int(r), c1, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
+                    pieces[2] = [(int(r), c2, col)] + [(int(r) - 1, co, col) for co in [c0, c1, c2]]
                     
                     
                     newBoards = [{}, {}, {}]
@@ -964,8 +967,9 @@ while True:
                     paths[0] = generatePath(newBoards[0], pieces[0])
                     paths[1] = generatePath(newBoards[1], pieces[1])
                     paths[2] = generatePath(newBoards[2], pieces[2])
-                    
-                    if not [i for i in range(3) if paths[i] != -1 and newBoards[i][-1] != [None] * 10]:
+
+                    if not [i for i in range(3) if paths[i] != -1 and newBoards[i][-1] == [None] * 10]:
+                        selected = []
                         i = random.randrange(3)
                         piece = pieces[i]
                         board = newBoards[i]
@@ -978,7 +982,7 @@ while True:
                 elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 1 and len(set([r for (r, c) in selected])) == 2:
                     [(blockr, blockc)] = [(r, c) for (r, c) in selected if r == int(r)]
                     [c0, c1] = [c for (r, c) in selected if r != blockr]
-                    [r] = [r for (r, c) in selected if r != blockr]
+                    r = [r for (r, c) in selected if r != blockr][0]
                     
                     if blockr > r:
                         locs = [(ro + int(r) - 1, co) for ro in range(2) for co in range(10) if co != blockc and (not co in [c0, c1] or ro != 0)]
@@ -997,6 +1001,7 @@ while True:
                         piece = [(blockr, blockc, col), (int(r), blockc, col), (int(r) - 1, c0, col), (int(r) - 1, c1, col)]
                         path = generatePath(board, piece)
                         if path == -1 or board[-1] != [None] * 10:
+                            selected = []
                             break
                     else:
                         col = board[blockr][blockc]
@@ -1036,6 +1041,7 @@ while True:
                         
                         if (paths[0] == -1 or newBoards[0][-1] != [None] * 10) and \
                                 (paths[1] == -1 or newBoards[1][-1] != [None] * 10):
+                            selected = []
                             i = random.randrange(2)
                             piece = pieces[i]
                             board = newBoards[i]
@@ -1052,18 +1058,19 @@ while True:
                     piece = [(selected[1][0] - 3 + r, selected[0][1], col) for r in range(4)]
                     r = selected[1][0]
                     c = selected[0][1]
+                    print r, c
                     newBoards = [{}, {}]
                     for i in range(-4, r - 3):
                         newBoards[0][i] = board[i + 3]
                         newBoards[1][i] = board[i + 3]
                     for i in range(r - 3, r + 1):
-                        newBoard[0][i] = [None] * 10
-                        newBoard[1][i] = [None] * 10
+                        newBoards[0][i] = [None] * 10
+                        newBoards[1][i] = [None] * 10
                     for i in range(r + 1, 16):
                         newBoards[0][i] = board[i]
                         newBoards[1][i] = board[i]
-                    newBoard[0][r - 1] = board[r]
-                    newBoard[1][r - 2] = board[r]
+                    newBoards[0][r - 1] = board[r]
+                    newBoards[1][r - 2] = board[r]
 
                     locs = [[(ro, co) for ro in [r - 3, r - 2, r] for co in range(10) if co != c], \
                             [(ro, co) for ro in [r - 3, r - 1, r] for co in range(10) if co != c]]
@@ -1071,18 +1078,17 @@ while True:
                     colorBoard(newBoards[1], locs[1], colors[:colorRange])
                     
                     paths = [[], []]
-                    paths[0] = generatePath(newBoards[0], pieces[0])
-                    paths[1] = generatePath(newBoards[1], pieces[1])
+                    paths[0] = generatePath(newBoards[0], piece)
+                    paths[1] = generatePath(newBoards[1], piece)
                     
                     if (paths[0] == -1 or newBoards[0][-1] != [None] * 10) and \
                             (paths[1] == -1 or newBoards[1][-1] != [None] * 10):
+                        selected = []
                         i = random.randrange(2)
-                        piece = pieces[i]
                         board = newBoards[i]
                         break
                     
                     i = random.choice([i for i in range(2) if paths[i] != -1 and newBoards[i][-1] == [None] * 10])
-                    piece = pieces[i]
                     board = newBoards[i]
                     path = paths[i]
                 elif len(selected) == 3 and len([1 for (r, c) in selected if int(r) == r]) == 2:
@@ -1113,6 +1119,7 @@ while True:
                     
                     path = generatePath(board, piece)
                     if path == -1 or board[-1] != [None] * 10:
+                        selected = []
                         break
                 elif len(selected) == 4:
                     for (r, c) in selected:
@@ -1144,10 +1151,14 @@ while True:
                     board = newBoard
                     
                     if board[-1] != [None] * 10:
+                        selected = []
                         break
                     path = generatePath(board, piece)
                     if path == -1:
+                        selected = []
                         break
+                else:
+                    break
                 selected = []
                 while pygame.event.poll().type != pygame.NOEVENT:
                     pass
@@ -1247,5 +1258,33 @@ while True:
         del event
         clock.tick(40)
 
-pygame.time.wait(500)
 screen.fill(white)
+tmp = []
+for loc in selected:
+    if loc != None:
+        r, c = loc
+        if r == int(r):
+            pygame.draw.rect(screen, blockSelectionColor, (25 * c, 25 * r, 25, 25))
+        else:
+            tmp.append(loc)
+for loc in tmp:
+    r, c = loc
+    pygame.draw.rect(screen, lineSelectionColor, (0, 25 * int(r) + 22, 250, 6))
+for loc in tmp:
+    r, c = loc
+    pygame.draw.rect(screen, spaceSelectionColor, (25 * c, 25 * int(r) + 20, 25, 10))
+del tmp
+for loc in piece:
+    if loc != None:
+        r, c, col = loc
+        pygame.draw.rect(screen, col, (25 * c, 25 * r, 25, 25))
+del loc
+for r in range(16):
+    for c in range(10):
+        if board[r][c]:
+            pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
+pygame.display.update()
+clock.tick(40)
+pygame.time.wait(5000)
+screen.fill(white)
+pygame.display.update()
