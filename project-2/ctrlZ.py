@@ -14,7 +14,7 @@ spaceSelectionColor = (0, 155, 255)
 def colorBoard(brd, locs, clrs):
     random.shuffle(locs)
     for (r, c) in locs:
-        if random.choice([1, 0]):
+        if not random.choice([2, 1, 0]):
             brd[r][c] = random.choice(clrs)
         else:
             neighbors = [brd[r + ro][c + co] for (ro, co) in [(-1, 0), (1, 0), (0, 1), (0, -1)] \
@@ -647,17 +647,18 @@ while 1:
 	moveDelay = 30
 	ticks = 30
 	colorRange = 2
-	colors = [(r, g, b) for r in range(0, 255, 50) \
-	                    for g in range(0, 255, 50) \
-	                    for b in range(0, 255, 50) \
+	colors = [(r, g, b) for r in range(0, 255, 75) \
+	                    for g in range(0, 255, 75) \
+	                    for b in range(0, 255, 75) \
 	                    if r != g and g != b and r != b]
 	random.shuffle(colors)
+        print len(colors)
 	colors = colors[:10]
 	
-	avoid = [random.randrange(10) for r in range(6, 16)]
-	take = [random.choice([c for c in range(10) if c != avoid[r - 6]]) for r in range(6, 16)]
+	avoid = [random.randrange(10) for r in range(8, 16)]
+	take = [random.choice([c for c in range(10) if c != avoid[r - 8]]) for r in range(8, 16)]
 	
-	colorBoard(board, [(r, c) for r in range(6, 16) for c in range(10) if (random.randrange(18) - 6 < r and c != avoid[r - 6]) or c == take[r- 6]], colors[:colorRange])
+	colorBoard(board, [(r, c) for r in range(8, 16) for c in range(10) if (random.randrange(18) - 8 < r and c != avoid[r - 8]) or c == take[r- 8]], colors[:colorRange])
 	
 	while 1:
 	    t = random.randrange(7)
