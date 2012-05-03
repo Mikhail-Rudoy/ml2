@@ -8,7 +8,7 @@ clock = pygame.time.Clock()
 white = (255, 255, 255)
 black = (0, 0, 0)
 blockSelectionColor = (0, 155, 255)
-lineSelectionColor = (0, 200, 0)
+lineSelectionColor = (0,1 200, 0)
 spaceSelectionColor = (0, 155, 255)
 
 def colorBoard(brd, locs, clrs):
@@ -856,6 +856,42 @@ while 1:
 	                     not [r for (r, c) in notyet \
 	                            if r != notyet[0][0]])) or \
 	                not [1 for r in range(-4, 16) if set(range(-4, r + 1)) == set([r for r in range(-4, 16) if board[r] == [None] * 10]) | set([1 for r in set([r for (r, c) in already]) if not [c for c in range(10) if board[r][c] and not (r, c) in already]])]:
+                        print "-------------------------------------------------------"
+                        print "(len(notyet) == 0 and len(already) != 4)"
+                        print (len(notyet) == 0 and len(already) != 4)
+                        print
+                        print """(len(already) > 0 and [1 for (r, c) in already \
+	                                        if board[r][c] != \
+	                                           board[already[0][0]][already[0][1]]])"""
+                        print """(not [(r + 1, c) for (r, c) in already \
+	                                if not (r + 1, c) in selected \
+	                                if (r + 1 == 16 or \
+	                                    board[r + 1][c])] and \
+	                not [(int(r) + 1, c) for (r, c) in notyet \
+	                                     if not (int(r) + 1, c) in selected \
+	                                     if (int(r) + 1 == 16 or \
+	                                         board[int(r) + 1][c])] and \
+	                not (len(notyet) + len(already) < 4 and \
+	                     len(notyet) > 1 and \
+	                     not [r for (r, c) in notyet \
+	                            if r != notyet[0][0]]))"""
+                        print (not [(r + 1, c) for (r, c) in already \
+	                                if not (r + 1, c) in selected \
+	                                if (r + 1 == 16 or \
+	                                    board[r + 1][c])] and \
+	                not [(int(r) + 1, c) for (r, c) in notyet \
+	                                     if not (int(r) + 1, c) in selected \
+	                                     if (int(r) + 1 == 16 or \
+	                                         board[int(r) + 1][c])] and \
+	                not (len(notyet) + len(already) < 4 and \
+	                     len(notyet) > 1 and \
+	                     not [r for (r, c) in notyet \
+	                            if r != notyet[0][0]]))
+                        print
+                        print "not [1 for r in range(-4, 16) if set(range(-4, r + 1)) == set([r for r in range(-4, 16) if board[r] == [None] * 10]) | set([1 for r in set([r for (r, c) in already]) if not [c for c in range(10) if board[r][c] and not (r, c) in already]])]"
+                        print not [1 for r in range(-4, 16) if set(range(-4, r + 1)) == set([r for r in range(-4, 16) if board[r] == [None] * 10]) | set([1 for r in set([r for (r, c) in already]) if not [c for c in range(10) if board[r][c] and not (r, c) in already]])]
+                        print
+                        
 	                for itm in already:
 	                    pygame.draw.rect(screen, white, (25 * itm[1], 25 * itm[0], 25, 25))
 	                    if board[itm[0]][itm[1]]:
