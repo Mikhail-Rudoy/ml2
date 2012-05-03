@@ -1,4 +1,4 @@
-import pygame, sys, random
+import pygame, sys, random, heapq
 
 pygame.init()
 pygame.mixer.init()
@@ -26,8 +26,357 @@ def colorBoard(brd, locs, clrs):
             else:
                 brd[r][c] = random.choice(clrs)
 
+shapes = [None] * 7
+displacement = [None] * 7
+startData = [None] * 7
+
+# 
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+#     #
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+#
+shapes[0] = [[set([(0, 0), (0, 1), (1, 0), (1, 1)])]]
+displacement[0] = [(0, 0)]
+startData[0] = (-2, 4, 0)
+
+# 
+#  / \ / \ / \ / \
+#  | | | | | | | |
+#  \_/ \_/ \_/ \_/
+#         #
+# 
+
+# 
+#  / \
+#  | |
+#  \_/
+# 
+#  / \
+#  | |
+#  \_/
+# #
+#  / \
+#  | |
+#  \_/
+# 
+#  / \
+#  | |
+#  \_/
+#
+
+# 
+#         #
+#  / \ / \ / \ / \
+#  | | | | | | | |
+#  \_/ \_/ \_/ \_/
+# 
+
+# 
+#  / \
+#  | |
+#  \_/
+# 
+#  / \
+#  | |
+#  \_/
+#     #
+#  / \
+#  | |
+#  \_/
+# 
+#  / \
+#  | |
+#  \_/
+#
+
+shapes[1] = [set([(0, 0), (0, 1), (0, 2), (0, 3)]), \
+                 set([(0, 0), (1, 0), (2, 0), (3, 0)]), \
+                 set([(0, 0), (0, 1), (0, 2), (0, 3)]), \
+                 set([(0, 0), (1, 0), (2, 0), (3, 0)])]
+displacement[1] = [(0, 0), (-1, 2), (1, 0), (-1, 1)]
+startData[1] = (-1, 3, 0)
+
+#
+#  / \ / \ / \
+#  | | |#| | |
+#  \_/ \_/ \_/
+# 
+#      / \
+#      | |
+#      \_/
+# 
+
+# 
+#      / \
+#      | |
+#      \_/
+# 
+#  / \ / \
+#  | | |#|
+#  \_/ \_/
+#     
+#      / \
+#      | |
+#      \_/
+# 
+
+# 
+#      / \
+#      | |
+#      \_/
+# 
+#  / \ / \ / \
+#  | | |#| | |
+#  \_/ \_/ \_/
+# 
+
+# 
+#  / \
+#  | |
+#  \_/
+# 
+#  / \ / \
+#  |#| | |
+#  \_/ \_/
+#     
+#  / \
+#  | |
+#  \_/
+# 
+
+shapes[2] = [set([(0, 0), (0, 1), (0, 2), (1, 1)]), \
+                 set([(0, 1), (1, 0), (1, 1), (2, 1)]) \
+                 set([(0, 1), (1, 0), (1, 1), (1, 2)]) \
+                 set([(0, 0), (1, 0), (1, 1), (2, 0)])]
+displacement[2] = [(0, 0), (-1, 0), (-1,  0), (-1, 1)]
+startData[2] = (-2, 3, 2)
+
+#
+#  / \ / \ / \
+#  | | |#| | |
+#  \_/ \_/ \_/
+# 
+#  / \
+#  | |
+#  \_/
+# 
+
+# 
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+# 
+#      / \
+#      |#|
+#      \_/
+#     
+#      / \
+#      | |
+#      \_/
+# 
+
+# 
+#          / \
+#          | |
+#          \_/
+# 
+#  / \ / \ / \
+#  | | |#| | |
+#  \_/ \_/ \_/
+# 
+
+# 
+#  / \
+#  | |
+#  \_/
+# 
+#  / \ 
+#  |#| 
+#  \_/ 
+#     
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+# 
+
+shapes[3] = [set([(0, 0), (0, 1), (0, 2), (1, 0)]), \
+                 set([(0, 0), (0, 1), (1, 1), (2, 1)]), \
+                 set([(0, 2), (1, 0), (1, 1), (1, 2)]), \
+                 set([(0, 0), (1, 0), (2, 0), (2, 1)])]
+displacement[3] = [(0, 0), (-1, 0), (-1, 0), (-1, 1)]
+startData[3] = (-2, 3, 2)
+
+#
+#  / \ / \ / \
+#  | | |#| | |
+#  \_/ \_/ \_/
+# 
+#          / \
+#          | |
+#          \_/
+# 
+
+# 
+#      / \
+#      | |
+#      \_/
+# 
+#      / \
+#      |#|
+#      \_/
+# 
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+# 
+
+# 
+#  / \
+#  | |
+#  \_/
+# 
+#  / \ / \ / \
+#  | | |#| | |
+#  \_/ \_/ \_/
+# 
+
+#     
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+# 
+#  / \ 
+#  |#| 
+#  \_/ 
+# 
+#  / \
+#  | |
+#  \_/
+# 
+
+shapes[4] = [set([(0, 0), (0, 1), (0, 2), (1, 2)]), \
+                 set([(0, 1), (1, 1), (2, 0), (2, 1)]), \
+                 set([(0, 0), (1, 0), (1, 1), (1, 2)]), \
+                 set([(0, 0), (0, 1), (1, 0), (2, 0)])]
+displacement[4] = [(0, 0), (-1, 0), (-1, 0), (-1, 1)]
+startData[4] = (-2, 3, 2)
+
+#
+#  / \ / \
+#  | | |#|
+#  \_/ \_/
+# 
+#      / \ / \
+#      | | | |
+#      \_/ \_/
+# 
+
+# 
+#      / \
+#      | |
+#      \_/
+# 
+#  / \ / \
+#  | | |#|
+#  \_/ \_/
+# 
+#  / \
+#  | |
+#  \_/
+# 
+
+#
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+# 
+#      / \ / \
+#      |#| | |
+#      \_/ \_/
+#
+
+# 
+#      / \
+#      | |
+#      \_/
+# 
+#  / \ / \
+#  |#| | |
+#  \_/ \_/
+# 
+#  / \
+#  | |
+#  \_/
+# 
+
+shapes[5] = [set([(0, 0), (0, 1), (1, 1), (1, 2)]), \
+                 set([(0, 1), (1, 0), (1, 1), (2, 0)]), \
+                 set([(0, 0), (0, 1), (1, 1), (1, 2)]), \
+                 set([(0, 1), (1, 0), (1, 1), (2, 0)])]
+displacement[5] = [(0, 0), (-1, 0), (-1, 0), (-1, 1)]
+startData[5] = (-2, 3, 2)
+
+#
+#      / \ / \
+#      |#| | |
+#      \_/ \_/
+# 
+#  / \ / \
+#  | | | |
+#  \_/ \_/
+# 
+
+# 
+#  / \
+#  | |
+#  \_/
+# 
+#  / \ / \
+#  | | |#|
+#  \_/ \_/
+# 
+#      / \
+#      | |
+#      \_/
+# 
+
+#
+#      / \ / \
+#      | | | |
+#      \_/ \_/
+# 
+#  / \ / \
+#  | | |#|
+#  \_/ \_/
+# 
+
+# 
+#  / \
+#  | |
+#  \_/
+# 
+#  / \ / \
+#  |#| | |
+#  \_/ \_/
+# 
+#      / \
+#      | |
+#      \_/
+# 
+
+shapes[6] = [set([(0, 1), (0, 2), (1, 0), (1, 1)]), \
+                 set([(0, 0), (1, 0), (1, 1), (2, 1)]), \
+                 set([(0, 1), (0, 2), (1, 0), (1, 1)]), \
+                 set([(0, 0), (1, 0), (1, 1), (2, 1)])]
+displacement[6] = [(0, 0), (-1, 0), (-1, 0), (-1, 1)]
+startData[6] = (-2, 3, 2)
+
 def generatePath(board, piece):
-    path = []
+    global shapes
     minr = piece[0][0]
     minc = piece[0][1]
     col = piece[0][2]
@@ -37,131 +386,109 @@ def generatePath(board, piece):
         if c < minc:
             minc = c
     template = set([(r - minr, c - minc) for (r, c, col) in piece])
-    if template == set([(0, 0), (0, 1), (1, 1), (1, 0)]):
-        # 
-        # 00
-        # 00
-        # 
-        pass
-    if template == set([(0, 0), (0, 1), (0, 2), (0, 3)]):
-        # 
-        # 0000
-        # 
-        pass
-    if template == set([(0, 0), (1, 0), (2, 0), (3, 0)]):
-        # 
-        # 0
-        # 0
-        # 0
-        # 0
-        # 
-        pass
-    if template == set([(0, 1), (1, 0), (1, 1), (2, 1)]):
-        # 
-        #  0
-        # 00
-        #  0
-        # 
-        pass
-    if template == set([(0, 0), (0, 1), (0, 2), (1, 1)]):
-        # 
-        # 000
-        #  0
-        # 
-        pass
-    if template == set([(0, 0), (1, 0), (1, 1), (2, 0)]):
-        # 
-        # 0
-        # 00
-        # 0
-        # 
-        pass
-    if template == set([(0, 1), (1, 0), (1, 1), (1, 2)]):
-        # 
-        #  0
-        # 000
-        # 
-        pass
-    if template == set([(0, 0), (1, 0), (2, 0), (2, 1)]):
-        # 
-        # 0
-        # 0
-        # 00
-        # 
-        pass
-    if template == set([(0, 2), (1, 0), (1, 1), (1, 2)]):
-        # 
-        #   0
-        # 000
-        # 
-        pass
-    if template == set([(0, 0), (0, 1), (1, 1), (2, 1)]):
-        # 
-        # 00
-        #  0
-        #  0
-        # 
-        pass
-    if template == set([(0, 0), (0, 1), (0, 2), (1, 0)]):
-        # 
-        # 000
-        # 0
-        # 
-        pass
-    if template == set([(0, 0), (0, 1), (1, 0), (2, 0)]):
-        # 
-        # 00
-        # 0
-        # 0
-        # 
-        pass
-    if template == set([(0, 0), (1, 0), (1, 1), (1, 2)]):
-        # 
-        # 0
-        # 000
-        # 
-        pass
-    if template == set([(0, 1), (1, 1), (2, 0), (2, 1)]):
-        # 
-        #  0
-        #  0
-        # 00
-        # 
-        pass
-    if template == set([(0, 0), (0, 1), (0, 2), (1, 2)]):
-        # 
-        # 000
-        #   0
-        # 
-        pass
-    if template == set([(0, 0), (0, 1), (1, 1), (1, 2)]):
-        # 
-        # 00
-        #  00
-        # 
-        pass
-    if template == set([(0, 1), (1, 0), (1, 1), (2, 0)]):
-        # 
-        #  0
-        # 00
-        # 0
-        # 
-        pass
-    if template == set([(0, 1), (0, 2), (1, 0), (1, 1)]):
-        # 
-        #  00
-        # 00
-        # 
-        pass
-    if template == set([(0, 0), (1, 0), (1, 1), (2, 1)]):
-        # 
-        # 0
-        # 00
-        #  0
-        # 
-        pass
+    paths = []
+    for (t, o) in [(0, 0)] + [(t, o) for t in range(1, 7) for o in range(4)]:
+        if shapes[t][o] == template:
+            path = getPath(board, inr, minc, t, o, col)
+            if path != -1:
+                paths.append(path)
+    if len(paths) == 0:
+        return -1
+    else:
+        return random.choice(paths)
     
+def getPath(board, r, c, t, o, col):
+    global shapes
+    global displacement
+    global startData
+    space = [{}] * len(shapes[t])
+    for oi in range(len(space)):
+         for ri in range(-4, 16):
+             space[oi][ri] = [None] * 10
+    ri, ci, oi = startData[t]
     
+    dist = lambda rparam, cparam, oparam, tmpr = r, tmpc = c, tmpo = 0: abs(rparam - tmpr) + abs(cparam - tmpc) + 6 - 3 * abs(abs(oparam - tmpo) - 2)
+    isValid = lambda rparam, cparam: rparam >= -4 and rparam < 16 and cparam >= 0 and cparam < 10
+
+    neighbors = []
+    heapq.heappush(neighbors, (dist(ri, ci, oi), 0, 4, ri, ci, oi))
+    
+
+    success = False
+    while heapq:
+        priority, sofar, numonlevel, ri, ci, oi = heapq.heappop(neighbors)
+        go = True
+        for (dr, dc) in shapes[t][oi]:
+            if not isValid(dr + ri, dc + ci):
+                go = False
+            elif board[dr + ri][dc + ci]:
+                space[ri, ci, oi] = -1
+                go = False
+        if not go:
+            continue
+        space[oi][ri][ci] = numonlevel
+        
+        if dist(ri, ci, oi) == 0:
+            success = True
+            break
+
+
+        if ri < 15 and space[oi][ri + 1][ci] == None:
+            heapq.heappush(neighbors, (sofar + 1 + dist(ri + 1, ci, oi), sofar + 1, 0, ri + 1, ci, oi))
+        if numonlevel != 4:
+            if ci < 9 and (space[oi][ri][ci + 1] == None or space[oi][ri][ci + 1] >  numonlevel + 1):
+                heapq.haeppush(neighbors, (sofar + 1 + dist(ri, ci + 1, oi), sofar + 1, numonlevel + 1, ri, ci + 1, oi))
+            if ci > 0 and (space[oi][ri][ci - 1] == None or space[oi][ri][ci - 1] >  numonlevel + 1):
+                heapq.haeppush(neighbors, (sofar + 1 + dist(ri, ci + 1, oi), sofar + 1, numonlevel + 1, ri, ci - 1, oi))
+            if t != 0:
+                dr = displacement[t][(oi + 1) % 4][0] - displacement[t][oi][0]
+                dc = displacement[t][(oi + 1) % 4][1] - displacement[t][oi][1]
+                if isValid(ri + dr, ci + dc) and (space[(oi + 1) % 4][ri + dr][ci + dc] == None or space[(oi + 1) % 4][ri + dr][ci + dc] > numonlevel + 1):
+                    heapq.heappush(neighbors, (sofar + 3 + dist(ri + dr, ci + dc, (oi + 1) % 4), sofar + 3, numonlevel + 1, ri + dr, ci + dc, (oi + 1) % 4))
+                dr = displacement[t][(oi - 1) % 4][0] - displacement[t][oi][0]
+                dc = displacement[t][(oi - 1) % 4][1] - displacement[t][oi][1]
+                if isValid(ri + dr, ci + dc) and (space[(oi - 1) % 4][ri + dr][ci + dc] == None or space[(oi - 1) % 4][ri + dr][ci + dc] > numonlevel + 1):
+                    heapq.heappush(neighbors, (sofar + 3 + dist(ri + dr, ci + dc, (oi - 1) % 4), sofar + 3, numonlevel + 1, ri + dr, ci + dc, (oi - 1) % 4))
+    
+    if not success:
+        return -1
+    path = []
+    newLine = True
+    while (r, c, o) != startData[t]:
+        piece = [(r + dr, c + dc, col) for (dr, dc) in shapes[t][o]]
+        numonlevel = space[o][r][c]
+        if newLine:
+            for i in range(4 - numonlevel):
+                path.append(piece)
+            newLine = False
+        path.append(piece)
+        if numonlevel == 0:
+            r = r - 1
+            newLine = True
+            continue
+        if c > 0 and space[o][r][c - 1] == numonlevel - 1:
+            c = c - 1
+            continue
+        if c < 9 and space[o][r][c + 1] == numonlevel - 1:
+            c = c + 1
+            continue
+        dr = displacement[t][(o + 1) % 4][0] - displacement[t][o][0]
+        dc = displacement[t][(o + 1) % 4][1] - displacement[t][o][1]
+        if isValid(r + dr, c + dc) and space[(o + 1) % 4][r + dr][c + dc] == numonlevel - 1:
+            o = (o + 1) % 4
+            r = r + dr
+            c = c + dc
+            continue
+        dr = displacement[t][(o - 1) % 4][0] - displacement[t][o][0]
+        dc = displacement[t][(o - 1) % 4][1] - displacement[t][o][1]
+        if isValid(r + dr, c + dc) and space[(o - 1) % 4][r + dr][c + dc] == numonlevel - 1:
+            o = (o - 1) % 4
+            r = r + dr
+            c = c + dc
+            continue
+    
+    path.append([(r + dr, c + dc, col) for (dr, dc) in shapes[t][o]])
+    return path
 
 pygame.display.set_caption("Ctrl-Z")
 
@@ -223,8 +550,8 @@ if not music:
 board = {}
 for i in range(-4, 16):
     board[i] = [(50, 100, 0), (100, 0, 50)] + [None] * 8
-selected = []
-piece = [None, None, None, None]
+piece = [(-3, 0, black), (-3, 1, black), (-3, 2, black), (-3, 3, black)]
+selected = [(15, 3), (15, 4), (14, 4), (14, 5)]
 path = []
 numPieces = 0
 moveDelay = 30
