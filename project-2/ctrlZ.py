@@ -560,6 +560,42 @@ while True:
             pygame.quit()
             sys.exit()
         else:
+            break
+    elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        break
+    else:
+        continue
+    clock.tick(4)
+    del event
+
+while pygame.event.poll().type != pygame.NOEVENT:
+    pass
+
+screen.fill(white)
+screen.blit(pygame.font.Font(None, 43).render("Click to Continue", True, black), (2, 170))
+
+
+pygame.display.update()
+
+while True:
+    event = pygame.event.poll()
+    if event.type == pygame.NOEVENT:
+        pass
+    elif event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+    elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_m:
+            if music:
+                music = False
+                pygame.mixer.music.pause()
+            else:
+                music = True
+                pygame.mixer.music.unpause()
+        elif event.key == pygame.K_ESCAPE:
+            pygame.quit()
+            sys.exit()
+        else:
             if music:
                 pygame.mixer.music.fadeout(500)
             else:
@@ -576,24 +612,39 @@ while True:
     clock.tick(4)
     del event
 
-while pygame.event.poll().type != pygame.NOEVENT:
-    pass
+
+screen.fill(white)
+screen.blit(pygame.font.Font(None, 60).render("Game Over", True, black), (10, 70))
+
+pygame.display.update()
+
+for i in range(20):
+    while pygame.event.poll().type != pygame.NOEVENT:
+        pass
+    clock.tick(4)
+
 
 pygame.mixer.music.load("song.wav")
 pygame.mixer.music.play(-1)
 if not music:
     pygame.mixer.music.pause()
 
+
+
+
+
+
+
+
+
 board = {}
 for i in range(-4, 16):
     board[i] = [None] * 10
-piece = [(-3, 0, black), (-3, 1, black), (-3, 2, black), (-3, 3, black)]
-selected = [(15, 3), (15, 4), (14, 4), (14, 5)]
-for (r, c) in selected:
-    board[r][c] = (200, 150, 30)
+piece = []
+selected = []
 path = [piece]
 numPieces = 0
-moveDelay = 5
+moveDelay = 30
 ticks = 30
 colorRange = 2
 colors = [(r, g, b) for r in range(0, 255, 50) \
@@ -603,6 +654,27 @@ colors = [(r, g, b) for r in range(0, 255, 50) \
 random.shuffle(colors)
 colors = colors[:10]
 
+avoid = [random.randrange(10) for r in range(6, 16)]
+take = [random.choice([c for c in range(10) if c != avoid[r - 6]]) for r in range(6, 16)]
+
+colorBoard(board, [(r, c) for r in range(6, 16) for c in range(10) if (random.randrange(18) - 6 < r and c != avoid[r - 6]) or c == take[r- 6]], colors[:colorRange])
+
+while 1:
+    t = random.randrange(7)
+    sr, sc, o = startData[t]
+    col = random.choice(colors[:colorRange])
+    for (r2, c2, col2) in selected:
+        board[r2][c2] = col2
+    selected = piece
+    piece = [(sr + dr, sc + dc, col) for (dr, dc) in shapes[t][o]]
+    while not [1 for (r, c, col) in piece if r > 14 or board[r + 1][c] or (r + 1, c) in [(r2, c2) for (r2, c2, col2) in selected]]:
+        piece = [(r + 1, c, col) for (r, c, col) in piece]
+    if [1 for (r, c, col) in piece if r < 0]:
+        break
+for (r, c, col) in selected:
+    board[r][c] = col
+selected = [(r, c) for (r, c, col) in selected]
+path = generatePath(board, piece)
 
 screen.fill(white)
 tmp = []
@@ -782,7 +854,8 @@ while True:
                 not (len(notyet) + len(already) < 4 and \
                      len(notyet) > 1 and \
                      not [r for (r, c) in notyet \
-                            if r != notyet[0][0]])):
+                            if r != notyet[0][0]])) or \
+                not [1 for r in range(-4, 16) if set(range(-4, r + 1)) == set([r for r in range(-4, 16) if board[r] == [None] * 10]) | set([1 for r in set([r for (r, c) in already]) if not [c for c in range(10) if board[r][c] and not (r, c) in already]])]:
                 for itm in already:
                     pygame.draw.rect(screen, white, (25 * itm[1], 25 * itm[0], 25, 25))
                     if board[itm[0]][itm[1]]:
@@ -812,7 +885,9 @@ while True:
             path = path[1:]
             if not [1 for (r, c, col) in piece if r >= 0]:
                 numPieces = numPieces + 1
-                if moveDelay > 4 and numPieces % 2 == 0:
+                if moveDelay == 30:
+                    moveDelay = 15
+                if moveDelay > 2 and numPieces % 2 == 0:
                     moveDelay = moveDelay - 1
                 if colorRange < len(colors) and numPieces % 6 == 0:
                     colorRange = colorRange + 1
@@ -1278,13 +1353,12 @@ for loc in piece:
     if loc != None:
         r, c, col = loc
         pygame.draw.rect(screen, col, (25 * c, 25 * r, 25, 25))
-del loc
 for r in range(16):
     for c in range(10):
         if board[r][c]:
             pygame.draw.rect(screen, board[r][c], (5 + 25 * c, 5 + 25 * r, 15, 15))
 pygame.display.update()
 clock.tick(40)
-pygame.time.wait(5000)
-screen.fill(white)
-pygame.display.update()
+pygame.time.wait(2000)
+while pygame.event.poll().type != pygame.NOEVENT:
+    pass
