@@ -842,9 +842,10 @@ while 1:
                     fail = False
                     rs = [r for (r, c) in notyet]
                     rs += [r for r in range(-4, 16) if [c for c in range(10) if not (r, c) in already and board[r][c]]]
+                    rs = sorted(rs)
                     if rs:
                         last = rs[0]
-                    for r in sorted(rs):
+                    for r in rs:
                         if abs(last - r) <= 1:
                             last = r
                         else:
