@@ -839,7 +839,17 @@ while 1:
 	        elif selected and moveDelay != 30:
 	            already = [itm for itm in selected if itm and itm[0] == int(itm[0])]
 	            notyet = [itm for itm in selected if itm and itm[0] != int(itm[0])]
-	            if (len(notyet) == 0 and len(already) != 4) or \
+                    fail = False
+                    rs = [r for (r, c) in notyet]
+                    rs += [r for r in range(-4, 16) if [c for c in range(10) if not (r, c) in already and board[r][c]]]
+                    if rs:
+                        last = rs[0]
+                    for r in sorted(rs):
+                        if abs(last - r) <= 1:
+                            last = r
+                        else:
+                            fail = True
+                    if (len(notyet) == 0 and len(already) != 4) or \
 	               (len(already) > 0 and [1 for (r, c) in already \
 	                                        if board[r][c] != \
 	                                           board[already[0][0]][already[0][1]]]) or \
@@ -855,43 +865,7 @@ while 1:
 	                     len(notyet) > 1 and \
 	                     not [r for (r, c) in notyet \
 	                            if r != notyet[0][0]])) or \
-	                not [1 for r in range(-4, 16) if set(range(-4, r + 1)) == set([r for r in range(-4, 16) if board[r] == [None] * 10]) | set([1 for r in set([r for (r, c) in already]) if not [c for c in range(10) if board[r][c] and not (r, c) in already]])]:
-                        print "-------------------------------------------------------"
-                        print "(len(notyet) == 0 and len(already) != 4)"
-                        print (len(notyet) == 0 and len(already) != 4)
-                        print
-                        print """(len(already) > 0 and [1 for (r, c) in already \
-	                                        if board[r][c] != \
-	                                           board[already[0][0]][already[0][1]]])"""
-                        print """(not [(r + 1, c) for (r, c) in already \
-	                                if not (r + 1, c) in selected \
-	                                if (r + 1 == 16 or \
-	                                    board[r + 1][c])] and \
-	                not [(int(r) + 1, c) for (r, c) in notyet \
-	                                     if not (int(r) + 1, c) in selected \
-	                                     if (int(r) + 1 == 16 or \
-	                                         board[int(r) + 1][c])] and \
-	                not (len(notyet) + len(already) < 4 and \
-	                     len(notyet) > 1 and \
-	                     not [r for (r, c) in notyet \
-	                            if r != notyet[0][0]]))"""
-                        print (not [(r + 1, c) for (r, c) in already \
-	                                if not (r + 1, c) in selected \
-	                                if (r + 1 == 16 or \
-	                                    board[r + 1][c])] and \
-	                not [(int(r) + 1, c) for (r, c) in notyet \
-	                                     if not (int(r) + 1, c) in selected \
-	                                     if (int(r) + 1 == 16 or \
-	                                         board[int(r) + 1][c])] and \
-	                not (len(notyet) + len(already) < 4 and \
-	                     len(notyet) > 1 and \
-	                     not [r for (r, c) in notyet \
-	                            if r != notyet[0][0]]))
-                        print
-                        print "not [1 for r in range(-4, 16) if set(range(-4, r + 1)) == set([r for r in range(-4, 16) if board[r] == [None] * 10]) | set([1 for r in set([r for (r, c) in already]) if not [c for c in range(10) if board[r][c] and not (r, c) in already]])]"
-                        print not [1 for r in range(-4, 16) if set(range(-4, r + 1)) == set([r for r in range(-4, 16) if board[r] == [None] * 10]) | set([1 for r in set([r for (r, c) in already]) if not [c for c in range(10) if board[r][c] and not (r, c) in already]])]
-                        print
-                        
+	                fail:
 	                for itm in already:
 	                    pygame.draw.rect(screen, white, (25 * itm[1], 25 * itm[0], 25, 25))
 	                    if board[itm[0]][itm[1]]:
@@ -922,7 +896,7 @@ while 1:
 	            if not [1 for (r, c, col) in piece if r >= 0]:
 	                numPieces = numPieces + 1
 	                if moveDelay == 30:
-	                    moveDelay = 10
+	                    moveDelay = 15
 	                if moveDelay > 2 and numPieces % 2 == 0:
 	                    moveDelay = moveDelay - 1
 	                if colorRange < len(colors) and numPieces % 6 == 0:
